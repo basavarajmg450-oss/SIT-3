@@ -1,3 +1,17 @@
+placementpro-frontend/node_modules
+placementpro-backend/node_modules
+
+placementpro-backend/.env
+*.log
+dist
+.DS_Store
+.env
+.env.*
+.vscode
+.idea
+*.sqlite
+coverage
+
 # Dependencies
 node_modules/
 **/node_modules/

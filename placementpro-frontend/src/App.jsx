@@ -4,7 +4,8 @@ import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-import Login from './pages/Login'
+import Landing from './pages/Landing'
+import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/StudentDashboard'
 import TPODashboard from './pages/TPODashboard'
 import AlumniDashboard from './pages/AlumniDashboard'
@@ -37,8 +38,9 @@ export default function App() {
               }}
             />
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/login" element={<Navigate to="/" replace />} />
               <Route
                 path="/student/*"
                 element={

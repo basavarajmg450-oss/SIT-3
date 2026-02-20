@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+// Use /api in dev so Vite proxy forwards to backend; use full URL when VITE_API_URL is set (e.g. production)
+const BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -18,8 +19,8 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('pp_token')
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'
+      if (window.location.pathname !== '/') {
+        window.location.href = '/'
       }
     }
     return Promise.reject(err)
@@ -27,10 +28,12 @@ api.interceptors.response.use(
 )
 
 export const authAPI = {
-  sendOTP: (data) => api.post('/auth/send-otp', data),
-  verifyOTP: (data) => api.post('/auth/verify-otp', data),
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data),
+  resetPassword: (data) => api.post('/auth/reset-password', data),
 }
 
 export const studentAPI = {
@@ -53,6 +56,7 @@ export const tpoAPI = {
   updateApplicationStatus: (data) => api.put('/tpo/application-status', data),
   getAnalytics: () => api.get('/tpo/analytics'),
   notifyStudents: (data) => api.post('/tpo/notify', data),
+  getInterviewSlots: (params) => api.get('/tpo/interview-slots', { params }),
   getAuditLogs: (params) => api.get('/tpo/audit-logs', { params }),
   exportReport: (params) => api.get('/tpo/export-report', { params }),
 }

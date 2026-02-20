@@ -3,7 +3,19 @@ const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roleCheck');
 const { auditLogger } = require('../middleware/auditLogger');
-const { createDrive, getDrives, getEligibleStudents, scheduleInterview, updateApplicationStatus, getAnalytics, notifyStudents, getAuditLogsController, exportReport, updateDrive } = require('../controllers/tpoController');
+const {
+  createDrive,
+  getDrives,
+  getEligibleStudents,
+  scheduleInterview,
+  updateApplicationStatus,
+  getAnalytics,
+  notifyStudents,
+  getAuditLogsController,
+  exportReport,
+  updateDrive,
+  getInterviewSlots,
+} = require('../controllers/tpoController');
 
 router.use(authenticate, requireRole('tpo'));
 
@@ -16,6 +28,7 @@ router.put('/application-status', auditLogger('UPDATE_APPLICATION_STATUS'), upda
 router.get('/analytics', getAnalytics);
 router.post('/notify', auditLogger('SEND_NOTIFICATION'), notifyStudents);
 router.get('/audit-logs', getAuditLogsController);
+router.get('/interview-slots', getInterviewSlots);
 router.get('/export-report', exportReport);
 
 module.exports = router;

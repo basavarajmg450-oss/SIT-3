@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { notificationAPI } from '../../services/api'
 import { timeAgo } from '../../utils/helpers'
-import { Bell, Moon, Sun, LogOut, User, Menu, X, ChevronDown } from 'lucide-react'
+import { Bell, Moon, Sun, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
 
 export default function Navbar({ onMenuClick, sidebarOpen }) {
   const { user, profile, logout } = useAuth()
@@ -59,7 +59,7 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/login')
+    navigate('/')
   }
 
   const roleLabel = { student: 'Student', tpo: 'TPO', alumni: 'Alumni' }
@@ -86,6 +86,14 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {user?.role === 'tpo' && (
+            <button
+              onClick={() => navigate('/tpo/drives?create=1')}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md"
+            >
+              <Plus className="w-4 h-4" /> New Drive
+            </button>
+          )}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-xl hover:bg-gray-100 transition-colors"

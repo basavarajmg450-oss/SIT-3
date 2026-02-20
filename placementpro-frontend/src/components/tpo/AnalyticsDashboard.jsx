@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { tpoAPI } from '../../services/api'
+import MarketIntelligence from '../common/MarketIntelligence'
 import toast from 'react-hot-toast'
 import {
   Chart as ChartJS,
@@ -135,7 +136,8 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map((card, i) => (
           <motion.div
             key={card.label}
@@ -152,6 +154,11 @@ export default function AnalyticsDashboard() {
             <p className="text-xs text-indigo-600 font-medium mt-0.5">{card.sub}</p>
           </motion.div>
         ))}
+      </div>
+
+        <div className="lg:col-span-2">
+          <MarketIntelligence />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

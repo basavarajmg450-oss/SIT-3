@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
     }
 
-    const user = await User.findById(decoded.userId).select('-otp -otpExpiry');
+    const user = await User.findById(decoded.userId);
     if (!user || !user.isActive) {
       return res.status(401).json({ success: false, message: 'User not found or deactivated.' });
     }

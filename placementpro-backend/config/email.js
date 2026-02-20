@@ -129,4 +129,32 @@ const sendInterviewSchedule = async (email, studentName, company, date, time, ty
   return sendEmail({ to: email, subject: `Interview Scheduled: ${company} | PlacementPro`, html });
 };
 
-module.exports = { sendEmail, sendOTPEmail, sendDriveNotification, sendInterviewSchedule };
+const sendPasswordResetEmail = async (email, resetUrl) => {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><style>
+      body { font-family: Arial, sans-serif; background: #f0f4ff; }
+      .container { max-width: 500px; margin: 40px auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+      .logo { text-align: center; margin-bottom: 24px; }
+      .logo h1 { color: #6366f1; font-size: 28px; margin: 0; }
+      .btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 24px 0; }
+      .note { color: #6b7280; font-size: 14px; }
+      .footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 24px; }
+    </style></head>
+    <body>
+      <div class="container">
+        <div class="logo"><h1>🎓 PlacementPro</h1></div>
+        <h2 style="color: #1f2937; text-align: center;">Reset Your Password</h2>
+        <p class="note">You requested a password reset. Click the button below to set a new password:</p>
+        <p style="text-align: center;"><a href="${resetUrl}" class="btn">Reset Password</a></p>
+        <p class="note">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
+        <div class="footer">© 2024 PlacementPro • Your Career Launchpad</div>
+      </div>
+    </body>
+    </html>
+  `;
+  return sendEmail({ to: email, subject: 'Reset Your PlacementPro Password', html, text: `Reset password: ${resetUrl}` });
+};
+
+module.exports = { sendEmail, sendOTPEmail, sendDriveNotification, sendInterviewSchedule, sendPasswordResetEmail };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { tpoAPI } from '../services/api'
 import Navbar from '../components/common/Navbar'
@@ -9,15 +9,24 @@ import { StatCard } from '../components/common/Card'
 import CreateDrive from '../components/tpo/CreateDrive'
 import AnalyticsDashboard from '../components/tpo/AnalyticsDashboard'
 import EligibleStudents from '../components/tpo/EligibleStudents'
+import InterviewCalendar from '../components/tpo/InterviewCalendar'
 import toast from 'react-hot-toast'
-import { formatDate, getStatusColor, getStatusIcon, formatSalaryRange } from '../utils/helpers'
-import { Plus, Download, RefreshCw, ChevronDown } from 'lucide-react'
+import { formatDate, getStatusColor, formatSalaryRange } from '../utils/helpers'
+import { Plus, Download, RefreshCw, ChevronDown, BarChart3, GraduationCap, FileText, ScrollText, Zap } from 'lucide-react'
+
+const quickActions = [
+  { label: 'Create Drive', icon: Plus, path: '/tpo/drives?create=1', color: 'indigo', gradient: 'from-indigo-500 to-purple-500' },
+  { label: 'View Analytics', icon: BarChart3, path: '/tpo/analytics', color: 'purple', gradient: 'from-purple-500 to-pink-500' },
+  { label: 'View Students', icon: GraduationCap, path: '/tpo/students', color: 'blue', gradient: 'from-blue-500 to-cyan-500' },
+  { label: 'Export Report', icon: Download, type: 'export', color: 'emerald', gradient: 'from-emerald-500 to-teal-500' },
+  { label: 'Audit Logs', icon: ScrollText, path: '/tpo/audit-logs', color: 'gray', gradient: 'from-slate-500 to-gray-600' },
+]
 
 function Home() {
-  const { user } = useAuth()
   const navigate = useNavigate()
   const [stats, setStats] = useState({ totalDrives: 0, activeDrives: 0, totalApplications: 0, placedStudents: 0 })
   const [recentDrives, setRecentDrives] = useState([])
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -34,16 +43,67 @@ function Home() {
     } catch {}
   }
 
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const { data } = await tpoAPI.exportReport()
+      const payload = { success: data.success, data: data.data, total: data.total, generatedAt: data.generatedAt }
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `placement_report_${Date.now()}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      toast.success('Report exported!')
+    } catch {
+      toast.error('Export failed')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const handleQuickAction = (action) => {
+    if (action.type === 'export') {
+      handleExport()
+    } else {
+      navigate(action.path)
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">TPO Dashboard 👨‍💼</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Manage drives, students, and placements</p>
+          <motion.h1
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-2xl font-bold text-gray-900"
+          >
+            TPO Dashboard 👨‍💼
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-500 text-sm mt-0.5"
+          >
+            Manage drives, students, and placements
+          </motion.p>
         </div>
-        <button onClick={() => navigate('/tpo/drives')} className="btn-primary text-sm flex items-center gap-2">
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate('/tpo/drives?create=1')}
+          className="btn-primary text-sm flex items-center gap-2 shadow-lg shadow-indigo-500/25"
+        >
           <Plus className="w-4 h-4" /> New Drive
-        </button>
+        </motion.button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -53,22 +113,48 @@ function Home() {
           { icon: '🎓', label: 'Placed Students', value: stats.placedStudents, color: 'purple' },
           { icon: '📋', label: 'Applications', value: stats.totalApplications, color: 'amber' },
         ].map((s, i) => (
-          <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.08, type: 'spring', stiffness: 120, damping: 18 }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+          >
             <StatCard {...s} />
           </motion.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <motion.div
+          className="lg:col-span-2"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold text-gray-900">Recent Drives</h2>
-              <button onClick={loadData} className="text-gray-400 hover:text-gray-600 transition-colors"><RefreshCw className="w-4 h-4" /></button>
+              <motion.button
+                whileHover={{ rotate: 180 }}
+                transition={{ duration: 0.4 }}
+                onClick={loadData}
+                className="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded-lg"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </motion.button>
             </div>
             <div className="space-y-3">
               {recentDrives.map((drive, i) => (
-                <motion.div key={drive._id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
+                <motion.div
+                  key={drive._id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 + i * 0.05 }}
+                  whileHover={{ x: 4, backgroundColor: '#f9fafb' }}
+                  onClick={() => navigate(`/tpo/drives`)}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer border border-transparent hover:border-indigo-100 transition-all"
+                >
                   <div>
                     <p className="font-medium text-gray-900 text-sm">{drive.company}</p>
                     <p className="text-xs text-gray-500">{drive.title}</p>
@@ -80,42 +166,94 @@ function Home() {
                   </div>
                 </motion.div>
               ))}
-              {recentDrives.length === 0 && <p className="text-center text-gray-400 text-sm py-6">No drives yet. Create your first drive!</p>}
+              {recentDrives.length === 0 && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-center text-gray-400 text-sm py-6"
+                >
+                  No drives yet. Create your first drive!
+                </motion.p>
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
-            <h2 className="font-semibold text-gray-900 mb-3">⚡ Quick Actions</h2>
-            {[
-              { label: 'Create Drive', icon: '➕', action: () => navigate('/tpo/drives'), color: 'indigo' },
-              { label: 'View Analytics', icon: '📊', action: () => navigate('/tpo/analytics'), color: 'purple' },
-              { label: 'View Students', icon: '🎓', action: () => navigate('/tpo/students'), color: 'blue' },
-              { label: 'Export Report', icon: '📥', action: async () => { try { const { data } = await tpoAPI.exportReport(); const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `placement_report_${Date.now()}.json`; a.click(); toast.success('Report exported!') } catch { toast.error('Export failed') } }, color: 'emerald' },
-              { label: 'Audit Logs', icon: '📜', action: () => navigate('/tpo/audit-logs'), color: 'gray' },
-            ].map((action) => (
-              <motion.button key={action.label} whileHover={{ x: 4 }} onClick={action.action} className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left group">
-                <span className="text-xl">{action.icon}</span>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">{action.label}</span>
-                <span className="ml-auto text-gray-300 group-hover:text-indigo-400">→</span>
-              </motion.button>
-            ))}
+        <motion.div
+          className="space-y-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.35, duration: 0.4 }}
+        >
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5 text-amber-500" />
+              <h2 className="font-semibold text-gray-900">Quick Actions</h2>
+            </div>
+            <div className="space-y-2">
+              {quickActions.map((action, i) => {
+                const Icon = action.icon
+                return (
+                  <motion.button
+                    key={action.label}
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + i * 0.06, type: 'spring', stiffness: 150 }}
+                    whileHover={{ x: 6, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleQuickAction(action)}
+                    disabled={action.type === 'export' && exporting}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all text-left group border border-transparent hover:border-indigo-100"
+                  >
+                    <motion.div
+                      className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-md`}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </motion.div>
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-700 transition-colors flex-1">
+                      {action.label}
+                    </span>
+                    {action.type === 'export' && exporting ? (
+                      <motion.div
+                        className="w-5 h-5 border-2 border-indigo-300 border-t-indigo-600 rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                      />
+                    ) : (
+                      <motion.span
+                        className="text-gray-300 group-hover:text-indigo-500"
+                        initial={false}
+                        whileHover={{ x: 4 }}
+                      >
+                        →
+                      </motion.span>
+                    )}
+                  </motion.button>
+                )
+              })}
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 function ManageDrives() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const openCreate = new URLSearchParams(location.search).get('create') === '1'
   const [drives, setDrives] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showCreate, setShowCreate] = useState(false)
+  const [showCreate, setShowCreate] = useState(openCreate)
   const [selected, setSelected] = useState(null)
 
   useEffect(() => { loadDrives() }, [])
+  useEffect(() => {
+    if (openCreate) setShowCreate(true)
+  }, [openCreate])
 
   const loadDrives = async () => {
     try {
@@ -273,7 +411,7 @@ export default function TPODashboard() {
             <Route path="/analytics" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Analytics 📊</h1><AnalyticsDashboard /></div>} />
             <Route path="/audit-logs" element={<AuditLogs />} />
             <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Applications</h1><p className="text-gray-500">Select a drive from Manage Drives to view applications.</p></div>} />
-            <Route path="/interviews" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Interviews 🎤</h1><p className="text-gray-500">Interview scheduling is done per drive from Eligible Students view.</p></div>} />
+            <Route path="/interviews" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Interviews 🎤</h1><InterviewCalendar /></div>} />
           </Routes>
         </div>
       </main>

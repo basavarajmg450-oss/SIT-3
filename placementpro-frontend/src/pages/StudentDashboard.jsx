@@ -13,6 +13,7 @@ import ProfileForm from '../components/student/ProfileForm'
 import SkillGapAnalysis from '../components/student/SkillGapAnalysis'
 import MentorshipBooking from '../components/student/MentorshipBooking'
 import PlacementBot from '../components/student/PlacementBot'
+import MarketIntelligence from '../components/common/MarketIntelligence'
 import { alumniAPI } from '../services/api'
 
 function Home() {
@@ -119,6 +120,8 @@ function Home() {
               ))}
             </div>
           </div>
+
+          <MarketIntelligence compact />
         </div>
       </div>
     </div>

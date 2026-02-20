@@ -1,5 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
 const StudentProfile = require('../models/StudentProfile');
@@ -15,10 +16,12 @@ const connectDB = async () => {
   console.log('✅ Connected to MongoDB');
 };
 
+const DEFAULT_PASSWORD = 'Password123';
+
 const seedUsers = [
-  { email: 'tpo@college.edu', role: 'tpo' },
-  { email: 'student1@college.edu', role: 'student' },
-  { email: 'student2@college.edu', role: 'student' },
+  { email: 'tpo@college.edu', role: 'tpo', name: 'TPO Officer' },
+  { email: 'student1@college.edu', role: 'student', name: 'Rahul Sharma' },
+  { email: 'student2@college.edu', role: 'student', name: 'Priya Patel' },
   { email: 'student3@college.edu', role: 'student' },
   { email: 'student4@college.edu', role: 'student' },
   { email: 'student5@college.edu', role: 'student' },
@@ -27,7 +30,7 @@ const seedUsers = [
   { email: 'student8@college.edu', role: 'student' },
   { email: 'student9@college.edu', role: 'student' },
   { email: 'student10@college.edu', role: 'student' },
-  { email: 'alumni1@gmail.com', role: 'alumni' },
+  { email: 'alumni1@gmail.com', role: 'alumni', name: 'Priya Patel' },
   { email: 'alumni2@gmail.com', role: 'alumni' },
   { email: 'alumni3@gmail.com', role: 'alumni' },
 ];
@@ -168,7 +171,14 @@ const seed = async () => {
     ]);
 
     console.log('👤 Creating users...');
-    const users = await User.insertMany(seedUsers);
+    const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD, 12);
+    const usersToInsert = seedUsers.map((u) => ({
+      email: u.email,
+      role: u.role,
+      name: u.name || '',
+      password: hashedPassword,
+    }));
+    const users = await User.insertMany(usersToInsert);
 
     const tpoUser = users[0];
     const studentUsers = users.slice(1, 11);
@@ -321,11 +331,10 @@ const seed = async () => {
     console.log(`   💼 Drives: ${drives.length}`);
     console.log(`   📝 Applications: ${applications.length}`);
     console.log(`   🔗 Referrals: ${referrals.length}`);
-    console.log('\n🔑 Test Credentials (use OTP login):');
+    console.log('\n🔑 Test Credentials (password: ' + DEFAULT_PASSWORD + '):');
     console.log('   TPO: tpo@college.edu');
     console.log('   Student: student1@college.edu');
     console.log('   Alumni: alumni1@gmail.com');
-    console.log('\n💡 Note: In development mode, OTP is logged to console.\n');
 
     await mongoose.disconnect();
   } catch (error) {

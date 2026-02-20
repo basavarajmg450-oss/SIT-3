@@ -17,7 +17,7 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🔐 OTP Auth | Secure 6-digit OTP login via email + JWT role-based access |
+| 🔐 Password Auth | Secure login with email/password + JWT role-based access |
 | 💼 Drive Management | TPO creates drives, auto-notifies eligible students |
 | 📊 Criteria Engine | Auto-filters students by CGPA, backlogs, branch |
 | 📄 PDF Resume | College-branded resume generator with PDFKit |
@@ -37,7 +37,7 @@
 **AI:** Google Gemini API  
 **PDF:** PDFKit  
 **Email:** Nodemailer  
-**Auth:** OTP + JWT
+**Auth:** Password + JWT
 
 ---
 
@@ -46,7 +46,7 @@
 ### Prerequisites
 - Node.js v18+
 - MongoDB (local or Atlas)
-- Gmail account (for OTP emails)
+- Gmail account (optional, for email notifications)
 
 ### 1. Clone & Setup
 
@@ -88,6 +88,11 @@ npm run dev
 
 App runs at: **http://localhost:3000**
 
+### Landing Page Structure
+- **Hero:** PlacementPro branding, tagline, Get Started & Watch Demo buttons, key stats (Students, Companies, Placement Rate, Avg. Package), scroll indicator
+- **Why Choose PlacementPro:** 6 feature cards (Smart Matching, Real-time Updates, Analytics, Alumni Network, Secure & Private, Resume Builder)
+- **Choose Your Dashboard:** 3 role cards (Student, TPO, Alumni) with embedded **password login** forms — scroll down to log in
+
 ---
 
 ## ⚙️ Environment Variables
@@ -111,13 +116,11 @@ FRONTEND_URL=http://localhost:3000
 
 After running seed data (`npm run seed`):
 
-| Role | Email |
-|------|-------|
-| TPO | tpo@college.edu |
-| Student | student1@college.edu |
-| Alumni | alumni1@gmail.com |
-
-> **Dev Mode:** OTP is printed to server console. No email setup required for testing.
+| Role | Email | Password |
+|------|-------|----------|
+| TPO | tpo@college.edu | Password123 |
+| Student | student1@college.edu | Password123 |
+| Alumni | alumni1@gmail.com | Password123 |
 
 ---
 
@@ -125,10 +128,12 @@ After running seed data (`npm run seed`):
 
 ### Auth
 ```
-POST /api/auth/send-otp    → Send OTP to email
-POST /api/auth/verify-otp  → Verify OTP, get JWT
-POST /api/auth/logout      → Logout
-GET  /api/auth/me          → Get current user
+POST /api/auth/register       → Register (email, password, role, name)
+POST /api/auth/login          → Login (email, password, role)
+POST /api/auth/forgot-password → Request password reset (email, role)
+POST /api/auth/reset-password  → Reset password (token, email, role, password)
+POST /api/auth/logout         → Logout
+GET  /api/auth/me             → Get current user
 ```
 
 ### Student
@@ -238,7 +243,7 @@ placementpro/
 └── placementpro-frontend/      # React + Vite SPA
     └── src/
         ├── components/         # Reusable UI components
-        │   ├── auth/           # OTP login, protected routes
+        │   ├── auth/           # Protected routes
         │   ├── common/         # Navbar, Sidebar, Cards
         │   ├── student/        # Student-specific components
         │   ├── tpo/            # TPO components

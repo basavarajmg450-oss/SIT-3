@@ -137,6 +137,47 @@ const scheduleInterview = async (req, res) => {
   }
 };
 
+const getInterviewSlots = async (req, res) => {
+  try {
+    const { start, end, driveId } = req.query;
+
+    const startDate = start ? new Date(start) : new Date();
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = end ? new Date(end) : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    endDate.setHours(23, 59, 59, 999);
+
+    const filter = {
+      status: 'Scheduled',
+      date: { $gte: startDate, $lte: endDate },
+    };
+    if (driveId) filter.driveId = driveId;
+
+    const slots = await InterviewSlot.find(filter)
+      .populate('driveId', 'company title')
+      .populate('studentId', 'email')
+      .sort({ date: 1, time: 1 })
+      .lean();
+
+    const mapped = slots.map((s) => ({
+      id: s._id,
+      date: s.date,
+      time: s.time,
+      duration: s.duration,
+      type: s.type,
+      mode: s.mode,
+      venue: s.venue,
+      status: s.status,
+      studentEmail: s.studentId?.email,
+      driveCompany: s.driveId?.company,
+      driveTitle: s.driveId?.title,
+    }));
+
+    res.json({ success: true, slots: mapped, total: mapped.length });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to load interview slots.' });
+  }
+};
+
 const updateApplicationStatus = async (req, res) => {
   try {
     const { applicationId, status, feedback } = req.body;
@@ -259,4 +300,16 @@ const updateDrive = async (req, res) => {
   }
 };
 
-module.exports = { createDrive, getDrives, getEligibleStudents, scheduleInterview, updateApplicationStatus, getAnalytics, notifyStudents, getAuditLogsController, exportReport, updateDrive };
+module.exports = {
+  createDrive,
+  getDrives,
+  getEligibleStudents,
+  scheduleInterview,
+  updateApplicationStatus,
+  getAnalytics,
+  notifyStudents,
+  getAuditLogsController,
+  exportReport,
+  updateDrive,
+  getInterviewSlots,
+};
