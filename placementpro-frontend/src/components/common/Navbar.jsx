@@ -63,7 +63,7 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
   }
 
   const roleLabel = { student: 'Student', tpo: 'TPO', alumni: 'Alumni' }
-  const roleBadge = { student: 'bg-blue-100 text-blue-700', tpo: 'bg-purple-100 text-purple-700', alumni: 'bg-emerald-100 text-emerald-700' }
+  const roleBadge = { student: 'bg-blue-500/20 text-blue-200', tpo: 'bg-purple-500/20 text-purple-200', alumni: 'bg-emerald-500/20 text-emerald-200' }
 
   const getTypeIcon = (type) => {
     const icons = { drive: '💼', application: '📋', interview: '🎤', referral: '🔗', mentorship: '🤝', system: '🔔', result: '🎉' }
@@ -71,11 +71,11 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 shadow-lg">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <button onClick={onMenuClick} className="p-2 rounded-xl hover:bg-gray-100 transition-colors lg:hidden">
-            {sidebarOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
+          <button onClick={onMenuClick} className="p-2 rounded-xl hover:bg-white/10 transition-colors lg:hidden text-white">
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎓</span>
@@ -96,19 +96,19 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
           )}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-xl hover:bg-white/10 transition-colors text-white"
             aria-label="Toggle theme"
           >
-            {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-gray-600" />}
+            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-300" />}
           </button>
 
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => setShowNotifs(!showNotifs)}
-              className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              className="relative p-2 rounded-xl hover:bg-white/10 transition-colors text-white"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-gray-600" />
+              <Bell className="w-5 h-5 text-slate-200" />
               {unreadCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
@@ -127,19 +127,19 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  className="absolute right-0 top-12 w-80 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50"
                 >
-                  <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                    <h3 className="font-semibold text-gray-900">Notifications</h3>
+                  <div className="flex items-center justify-between p-4 border-b border-white/10">
+                    <h3 className="font-semibold text-white">Notifications</h3>
                     {unreadCount > 0 && (
-                      <button onClick={handleMarkAllRead} className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">
+                      <button onClick={handleMarkAllRead} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">
                         Mark all read
                       </button>
                     )}
                   </div>
                   <div className="max-h-80 overflow-y-auto scrollbar-thin">
                     {notifications.length === 0 ? (
-                      <div className="p-6 text-center text-gray-400">
+                      <div className="p-6 text-center text-slate-400">
                         <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No notifications yet</p>
                       </div>
@@ -147,18 +147,18 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                       notifications.map((n) => (
                         <motion.div
                           key={n._id}
-                          whileHover={{ backgroundColor: '#f9fafb' }}
-                          className={`p-4 border-b border-gray-50 cursor-pointer transition-colors ${!n.isRead ? 'bg-indigo-50/50' : ''}`}
+                          whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
+                          className={`p-4 border-b border-white/5 cursor-pointer transition-colors ${!n.isRead ? 'bg-cyan-500/10' : ''}`}
                           onClick={() => { handleMarkRead(n._id); setShowNotifs(false) }}
                         >
                           <div className="flex gap-3">
                             <span className="text-lg flex-shrink-0">{getTypeIcon(n.type)}</span>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium ${n.isRead ? 'text-gray-700' : 'text-gray-900'}`}>{n.title}</p>
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>
-                              <p className="text-xs text-gray-400 mt-1">{timeAgo(n.createdAt)}</p>
+                              <p className={`text-sm font-medium ${n.isRead ? 'text-slate-300' : 'text-white'}`}>{n.title}</p>
+                              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{n.message}</p>
+                              <p className="text-xs text-slate-500 mt-1">{timeAgo(n.createdAt)}</p>
                             </div>
-                            {!n.isRead && <span className="w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0 mt-1.5" />}
+                            {!n.isRead && <span className="w-2 h-2 bg-cyan-400 rounded-full flex-shrink-0 mt-1.5" />}
                           </div>
                         </motion.div>
                       ))
@@ -172,20 +172,20 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/10 transition-colors"
             >
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
                 {profile?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-gray-800 leading-tight">
+                <p className="text-sm font-semibold text-white leading-tight">
                   {profile?.name || user?.email?.split('@')[0] || 'User'}
                 </p>
                 <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${roleBadge[user?.role]}`}>
                   {roleLabel[user?.role]}
                 </span>
               </div>
-              <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
+              <ChevronDown className="w-4 h-4 text-slate-400 hidden md:block" />
             </button>
 
             <AnimatePresence>
@@ -195,22 +195,22 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute right-0 top-12 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  className="absolute right-0 top-12 w-52 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50"
                 >
-                  <div className="p-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900">{profile?.name || 'User'}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  <div className="p-3 border-b border-white/10">
+                    <p className="text-sm font-semibold text-white">{profile?.name || 'User'}</p>
+                    <p className="text-xs text-slate-400">{user?.email}</p>
                   </div>
                   <button
                     onClick={() => { setShowProfile(false); navigate(user?.role === 'student' ? '/student' : user?.role === 'tpo' ? '/tpo' : '/alumni') }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                   >
                     <User className="w-4 h-4" />
                     Dashboard
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/20 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out

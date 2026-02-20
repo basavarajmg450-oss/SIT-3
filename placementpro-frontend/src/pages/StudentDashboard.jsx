@@ -13,6 +13,7 @@ import ProfileForm from '../components/student/ProfileForm'
 import SkillGapAnalysis from '../components/student/SkillGapAnalysis'
 import MentorshipBooking from '../components/student/MentorshipBooking'
 import PlacementBot from '../components/student/PlacementBot'
+import ResumeWizard from '../components/student/ResumeWizard'
 import MarketIntelligence from '../components/common/MarketIntelligence'
 import { alumniAPI } from '../services/api'
 
@@ -44,10 +45,10 @@ function Home() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-white">
           Welcome back, {profile?.name?.split(' ')[0] || 'Student'}! 👋
         </h1>
-        <p className="text-gray-500 text-sm mt-0.5">Here's your placement journey overview</p>
+        <p className="text-slate-400 text-sm mt-0.5">Here's your placement journey overview</p>
       </motion.div>
 
       {profile?.isPlaced && (
@@ -77,18 +78,18 @@ function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-5">
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">🔥 Eligible Drives</h2>
-              <button onClick={() => navigate('/student/drives')} className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">View all →</button>
+              <h2 className="font-semibold text-white">🔥 Eligible Drives</h2>
+              <button onClick={() => navigate('/student/drives')} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">View all →</button>
             </div>
             <DrivesFeed compact />
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">📋 Recent Applications</h2>
-              <button onClick={() => navigate('/student/applications')} className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">View all →</button>
+              <h2 className="font-semibold text-white">📋 Recent Applications</h2>
+              <button onClick={() => navigate('/student/applications')} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">View all →</button>
             </div>
             <ApplicationTracker compact />
           </div>
@@ -97,11 +98,12 @@ function Home() {
         <div className="space-y-5">
           <ProfileCompleteness profile={profile} />
 
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
-            <h2 className="font-semibold text-gray-900 mb-3">⚡ Quick Actions</h2>
+          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+            <h2 className="font-semibold text-white mb-3">⚡ Quick Actions</h2>
             <div className="space-y-2">
               {[
                 { label: 'Update Profile', icon: '👤', action: () => navigate('/student/profile'), color: 'indigo' },
+                { label: 'Resume Wizard', icon: '📄', action: () => navigate('/student/resume-wizard'), color: 'blue' },
                 { label: 'AI PlacementBot', icon: '🤖', action: () => navigate('/student/chatbot'), color: 'purple' },
                 { label: 'Skill Gap Analysis', icon: '📊', action: () => navigate('/student/skill-gap'), color: 'blue' },
                 { label: 'Book Mentorship', icon: '🤝', action: () => navigate('/student/mentorship'), color: 'emerald' },
@@ -111,11 +113,11 @@ function Home() {
                   whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={action.action}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition-colors text-left group"
                 >
                   <span className="text-xl">{action.icon}</span>
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">{action.label}</span>
-                  <span className="ml-auto text-gray-300 group-hover:text-indigo-400">→</span>
+                  <span className="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition-colors">{action.label}</span>
+                  <span className="ml-auto text-slate-500 group-hover:text-cyan-400">→</span>
                 </motion.button>
               ))}
             </div>
@@ -142,29 +144,29 @@ function Referrals() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-900">Alumni Referrals 🔗</h1>
+      <h1 className="text-2xl font-bold text-white">Alumni Referrals 🔗</h1>
       {referrals.length === 0 ? (
-        <div className="text-center py-10"><div className="text-4xl mb-3">🔗</div><p className="text-gray-500">No active referrals available</p></div>
+        <div className="text-center py-10"><div className="text-4xl mb-3">🔗</div><p className="text-slate-400">No active referrals available</p></div>
       ) : (
         referrals.map((ref, i) => (
-          <motion.div key={ref._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white rounded-2xl p-5 border border-gray-100">
+          <motion.div key={ref._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h3 className="font-semibold text-gray-900">{ref.role}</h3>
-                <p className="text-indigo-600 font-medium">{ref.company}</p>
-                <p className="text-sm text-gray-500 mt-0.5">By {ref.alumniProfileId?.name || 'Alumni'} • {ref.alumniProfileId?.designation}</p>
+                <h3 className="font-semibold text-white">{ref.role}</h3>
+                <p className="text-cyan-400 font-medium">{ref.company}</p>
+                <p className="text-sm text-slate-400 mt-0.5">By {ref.alumniProfileId?.name || 'Alumni'} • {ref.alumniProfileId?.designation}</p>
               </div>
-              <span className="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">{ref.salaryRange || 'Competitive'}</span>
+              <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-medium">{ref.salaryRange || 'Competitive'}</span>
             </div>
-            <p className="text-sm text-gray-600 mb-3">{ref.description}</p>
+            <p className="text-sm text-slate-300 mb-3">{ref.description}</p>
             {ref.requirements?.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
-                {ref.requirements.map((r) => <span key={r} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{r}</span>)}
+                {ref.requirements.map((r) => <span key={r} className="text-xs bg-white/10 text-slate-300 px-2 py-0.5 rounded-full">{r}</span>)}
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Deadline: {new Date(ref.deadline).toLocaleDateString()}</span>
-              <span className="text-xs text-gray-500">{ref.applicants?.length || 0}/{ref.maxReferrals} applied</span>
+              <span className="text-xs text-slate-400">Deadline: {new Date(ref.deadline).toLocaleDateString()}</span>
+              <span className="text-xs text-slate-400">{ref.applicants?.length || 0}/{ref.maxReferrals} applied</span>
             </div>
           </motion.div>
         ))
@@ -177,20 +179,21 @@ export default function StudentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="lg:ml-64 pt-16">
         <div className="p-4 lg:p-6 max-w-6xl mx-auto">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">My Profile</h1><ProfileForm /></div>} />
-            <Route path="/drives" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Eligible Drives 💼</h1><DrivesFeed /></div>} />
-            <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">My Applications 📋</h1><ApplicationTracker /></div>} />
-            <Route path="/skill-gap" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Skill Gap Analysis 📊</h1><SkillGapAnalysis /></div>} />
-            <Route path="/mentorship" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Book Mentorship 🤝</h1><MentorshipBooking /></div>} />
+            <Route path="/profile" element={<div><h1 className="text-2xl font-bold text-white mb-5">My Profile</h1><ProfileForm /></div>} />
+            <Route path="/resume-wizard" element={<div><h1 className="text-2xl font-bold text-white mb-5">Resume Wizard</h1><ResumeWizard /></div>} />
+            <Route path="/drives" element={<div><h1 className="text-2xl font-bold text-white mb-5">Eligible Drives 💼</h1><DrivesFeed /></div>} />
+            <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-white mb-5">My Applications 📋</h1><ApplicationTracker /></div>} />
+            <Route path="/skill-gap" element={<div><h1 className="text-2xl font-bold text-white mb-5">Skill Gap Analysis 📊</h1><SkillGapAnalysis /></div>} />
+            <Route path="/mentorship" element={<div><h1 className="text-2xl font-bold text-white mb-5">Book Mentorship 🤝</h1><MentorshipBooking /></div>} />
             <Route path="/referrals" element={<Referrals />} />
-            <Route path="/chatbot" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">PlacementBot 🤖</h1><PlacementBot isPage /></div>} />
+            <Route path="/chatbot" element={<div><h1 className="text-2xl font-bold text-white mb-5">PlacementBot 🤖</h1><PlacementBot isPage /></div>} />
           </Routes>
         </div>
       </main>

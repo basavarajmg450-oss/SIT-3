@@ -10,17 +10,17 @@ export default function LoadingSpinner({ size = 'md', text = '', fullScreen = fa
         animate={{ rotate: 360 }}
         transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
       />
-      {text && <p className="text-sm text-gray-500 font-medium">{text}</p>}
+      {text && <p className="text-sm text-slate-400 font-medium">{text}</p>}
     </div>
   )
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">🎓</div>
           {spinner}
-          {!text && <p className="text-sm text-gray-500 mt-2 font-medium">Loading PlacementPro...</p>}
+          {!text && <p className="text-sm text-slate-400 mt-2 font-medium">Loading PlacementPro...</p>}
         </div>
       </div>
     )

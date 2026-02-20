@@ -39,23 +39,23 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="p-5 border-b border-gray-100">
+      <div className="p-5 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
             {profile?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-sm">{profile?.name || user?.email?.split('@')[0]}</p>
-            <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+            <p className="font-semibold text-white text-sm">{profile?.name || user?.email?.split('@')[0]}</p>
+            <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
           </div>
         </div>
         {user?.role === 'student' && profile?.profileCompleteness !== undefined && (
           <div className="mt-3">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-gray-500">Profile</span>
-              <span className="text-xs font-semibold text-indigo-600">{profile.profileCompleteness}%</span>
+              <span className="text-xs text-slate-400">Profile</span>
+              <span className="text-xs font-semibold text-cyan-400">{profile.profileCompleteness}%</span>
             </div>
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${profile.profileCompleteness}%` }}
@@ -78,8 +78,8 @@ export default function Sidebar({ isOpen, onClose }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700 shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-white/15 text-white shadow-sm'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -90,7 +90,7 @@ export default function Sidebar({ isOpen, onClose }) {
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active"
-                        className="ml-auto w-1.5 h-5 bg-indigo-500 rounded-full"
+                        className="ml-auto w-1.5 h-5 bg-cyan-400 rounded-full"
                       />
                     )}
                   </>
@@ -101,10 +101,10 @@ export default function Sidebar({ isOpen, onClose }) {
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3">
-          <p className="text-xs font-semibold text-indigo-700 mb-0.5">PlacementPro v1.0</p>
-          <p className="text-xs text-indigo-500">Your Career Launchpad</p>
+      <div className="p-4 border-t border-white/10">
+        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+          <p className="text-xs font-semibold text-white mb-0.5">PlacementPro v1.0</p>
+          <p className="text-xs text-slate-400">Your Career Launchpad</p>
         </div>
       </div>
     </div>
@@ -128,12 +128,12 @@ export default function Sidebar({ isOpen, onClose }) {
         initial={false}
         animate={{ x: isOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-gray-100 shadow-xl z-30 lg:hidden"
+        className="fixed left-0 top-16 bottom-0 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-white/10 shadow-xl z-30 lg:hidden"
       >
         {sidebarContent}
       </motion.aside>
 
-      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-gray-100 z-20">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-slate-900/80 backdrop-blur-xl border-r border-white/10 z-20">
         {sidebarContent}
       </aside>
     </>

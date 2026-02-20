@@ -26,6 +26,14 @@ export default function InterviewCalendar() {
   })
   const [slots, setSlots] = useState([])
   const [loading, setLoading] = useState(true)
+  const [drives, setDrives] = useState([])
+  const [createOpen, setCreateOpen] = useState(false)
+  const [selectedDrive, setSelectedDrive] = useState('')
+  const [eligibleStudents, setEligibleStudents] = useState([])
+  const [studentToSchedule, setStudentToSchedule] = useState('')
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [newTime, setNewTime] = useState('10:00')
+  const [creating, setCreating] = useState(false)
 
   const weekDays = getWeekRange(startDate)
 
@@ -37,6 +45,9 @@ export default function InterviewCalendar() {
         const end = weekDays[weekDays.length - 1].toISOString()
         const { data } = await tpoAPI.getInterviewSlots({ start, end })
         if (data.success) setSlots(data.slots)
+        // load drives for quick scheduling
+        const drivesRes = await tpoAPI.getDrives({ limit: 100 })
+        if (drivesRes.data.success) setDrives(drivesRes.data.drives)
       } catch {
         toast.error('Failed to load interview schedule')
       } finally {
@@ -58,6 +69,48 @@ export default function InterviewCalendar() {
     const next = new Date(startDate)
     next.setDate(startDate.getDate() + direction * 7)
     setStartDate(next)
+  }
+
+  const openCreate = () => {
+    setSelectedDrive(drives[0]?._id || '')
+    setStudentToSchedule('')
+    setNewDate(new Date().toISOString().slice(0,10))
+    setNewTime('10:00')
+    setCreateOpen(true)
+  }
+
+  const loadEligible = async (driveId) => {
+    try {
+      if (!driveId) return setEligibleStudents([])
+      const { data } = await tpoAPI.getEligibleStudents(driveId)
+      if (data.success) setEligibleStudents(data.students || [])
+    } catch {
+      toast.error('Failed to load eligible students')
+    }
+  }
+
+  useEffect(() => { if (selectedDrive) loadEligible(selectedDrive) }, [selectedDrive])
+
+  const handleCreate = async () => {
+    if (!selectedDrive || !studentToSchedule || !newDate || !newTime) return toast.error('Fill all fields')
+    setCreating(true)
+    try {
+      const payload = { driveId: selectedDrive, studentId: studentToSchedule, date: newDate, time: newTime, type: 'Interview', mode: 'Online' }
+      const { data } = await tpoAPI.scheduleInterview(payload)
+      if (data.success) {
+        toast.success(data.message || 'Interview scheduled')
+        setCreateOpen(false)
+        // reload slots
+        const start = weekDays[0].toISOString()
+        const end = weekDays[weekDays.length - 1].toISOString()
+        const res = await tpoAPI.getInterviewSlots({ start, end })
+        if (res.data.success) setSlots(res.data.slots)
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to schedule interview')
+    } finally {
+      setCreating(false)
+    }
   }
 
   return (
@@ -82,6 +135,7 @@ export default function InterviewCalendar() {
           >
             Next →
           </button>
+          <button onClick={openCreate} className="ml-3 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm">Create Slot</button>
         </div>
       </div>
 
@@ -128,6 +182,41 @@ export default function InterviewCalendar() {
           })}
         </div>
       </div>
+      {createOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-lg bg-white rounded-2xl p-6 shadow-lg">
+            <h3 className="font-semibold text-gray-800 mb-3">Create Interview Slot</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Drive</label>
+                <select value={selectedDrive} onChange={(e) => setSelectedDrive(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm">
+                  <option value="">Select drive</option>
+                  {drives.map((d) => <option key={d._id} value={d._id}>{d.company} - {d.title}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Student</label>
+                <select value={studentToSchedule} onChange={(e) => setStudentToSchedule(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm">
+                  <option value="">Select student</option>
+                  {eligibleStudents.map((s) => <option key={s._id} value={s.userId?._id || s._id}>{s.name} • {s.regNumber}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Date</label>
+                <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Time</label>
+                <input type="time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => setCreateOpen(false)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm">Cancel</button>
+              <button disabled={creating} onClick={handleCreate} className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm">{creating ? 'Creating...' : 'Create Slot'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

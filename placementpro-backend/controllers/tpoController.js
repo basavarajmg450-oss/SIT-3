@@ -142,8 +142,10 @@ const getInterviewSlots = async (req, res) => {
     const { start, end, driveId } = req.query;
 
     const startDate = start ? new Date(start) : new Date();
+    if (isNaN(startDate.getTime())) return res.status(400).json({ success: false, message: 'Invalid start date.' });
     startDate.setHours(0, 0, 0, 0);
     const endDate = end ? new Date(end) : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (isNaN(endDate.getTime())) return res.status(400).json({ success: false, message: 'Invalid end date.' });
     endDate.setHours(23, 59, 59, 999);
 
     const filter = {
@@ -174,6 +176,7 @@ const getInterviewSlots = async (req, res) => {
 
     res.json({ success: true, slots: mapped, total: mapped.length });
   } catch (error) {
+    console.error('getInterviewSlots error:', error);
     res.status(500).json({ success: false, message: 'Failed to load interview slots.' });
   }
 };

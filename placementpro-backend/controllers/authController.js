@@ -124,14 +124,23 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}&role=${user.role}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}&role=${user.role}`;
     await sendPasswordResetEmail(user.email, resetUrl);
 
     if (process.env.NODE_ENV !== 'production') {
       console.log(`🔗 Password reset link (dev): ${resetUrl}`);
     }
 
-    res.json({ success: true, message: 'If an account exists, a reset link has been sent to your email.' });
+    // In development or when email is not configured, return the link so user can still reset
+    const isMockEmail = !process.env.EMAIL_USER || process.env.EMAIL_USER === 'your_email@gmail.com';
+    res.json({
+      success: true,
+      message: isMockEmail
+        ? 'Reset link generated. Use the link below (email is not configured).'
+        : 'If an account exists, a reset link has been sent to your email.',
+      ...((process.env.NODE_ENV !== 'production' || isMockEmail) && { resetLink: resetUrl }),
+    });
   } catch (error) {
     console.error('forgotPassword error:', error);
     res.status(500).json({ success: false, message: 'Failed to process request.' });

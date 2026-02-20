@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { authAPI } from '../services/api'
@@ -19,6 +19,8 @@ import {
   ChevronDown,
   ArrowRight,
   Play,
+  Sparkles,
+  Star,
 } from 'lucide-react'
 
 const DASHBOARDS = [
@@ -114,9 +116,66 @@ const WHY_CHOOSE = [
   },
 ]
 
+// Animated counter component
+function AnimatedCounter({ value, label, delay = 0 }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const numericValue = parseInt(value.replace(/\D/g, ''))
+          const suffix = value.replace(/\d/g, '')
+          let current = 0
+          const increment = numericValue / 50
+          const timer = setInterval(() => {
+            current += increment
+            if (current >= numericValue) {
+              setCount(numericValue)
+              clearInterval(timer)
+            } else {
+              setCount(Math.floor(current))
+            }
+          }, 30)
+          return () => clearInterval(timer)
+        }
+      },
+      { threshold: 0.5 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [value])
+
+  return (
+    <motion.div
+      ref={ref}
+      className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 shadow-lg shadow-black/20 hover:bg-white/15 transition-all"
+      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay, type: 'spring', stiffness: 100 }}
+      whileHover={{ scale: 1.1, rotateY: 5, rotateX: 5 }}
+      style={{ transformStyle: 'preserve-3d' }}
+    >
+      <motion.div
+        className="text-2xl md:text-3xl font-bold text-white"
+        key={count}
+        initial={{ scale: 1.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        {count}{value.replace(/\d/g, '')}
+      </motion.div>
+      <div className="text-sm text-white/60 mt-0.5">{label}</div>
+    </motion.div>
+  )
+}
+
 function DashboardLoginCard({ dashboard, onSuccess }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const Icon = dashboard.icon
 
   const handleLogin = async ({ email, password }) => {
@@ -165,40 +224,148 @@ function DashboardLoginCard({ dashboard, onSuccess }) {
     <>
       <motion.div
         layout
-        className={`rounded-2xl overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl ${dashboard.gradient}`}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        className={`h-full flex flex-col rounded-2xl overflow-hidden bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl shadow-black/30 ${dashboard.gradient} hover:border-cyan-400/40 transition-all relative group`}
+        initial={{ opacity: 0, y: 50, rotateX: -15 }}
+        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
+        whileHover={{ scale: 1.05, y: -8, rotateY: 5 }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
       >
-        <div className="p-6">
-          <div className="flex items-start gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-              <Icon className="w-7 h-7 text-white" />
-            </div>
+        {/* Animated gradient overlay */}
+        <motion.div
+          className={`absolute inset-0 bg-gradient-to-br ${dashboard.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+          animate={{ backgroundPosition: isHovered ? ['0% 0%', '100% 100%'] : '0% 0%' }}
+          transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
+        />
+        
+        {/* Sparkle effect */}
+        <AnimatePresence>
+          {isHovered && (
+            <>
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-cyan-400 rounded-full"
+                  initial={{
+                    x: '50%',
+                    y: '50%',
+                    opacity: 0,
+                    scale: 0,
+                  }}
+                  animate={{
+                    x: `${20 + Math.random() * 60}%`,
+                    y: `${20 + Math.random() * 60}%`,
+                    opacity: [0, 1, 0],
+                    scale: [0, 1.5, 0],
+                  }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  transition={{
+                    duration: 1.5,
+                    delay: i * 0.1,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                  }}
+                />
+              ))}
+            </>
+          )}
+        </AnimatePresence>
+
+        <div className="p-6 relative z-10 flex flex-col flex-1 min-h-0">
+          <div className="flex items-start gap-4 mb-4 shrink-0">
+            <motion.div
+              className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-white/20 transition-colors relative overflow-hidden"
+              whileHover={{ rotate: 360, scale: 1.15 }}
+              transition={{ duration: 0.6, type: 'spring' }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              />
+              <motion.div
+                className="relative z-10"
+                animate={isHovered ? { rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] } : { rotate: [0, 360] }}
+                transition={isHovered ? { duration: 0.5 } : { duration: 20, repeat: Infinity, ease: 'linear' }}
+              >
+                <Icon className="w-7 h-7 text-white icon-bounce" />
+              </motion.div>
+            </motion.div>
             <div>
-              <h3 className="text-xl font-bold text-white">{dashboard.title}</h3>
-              <p className="text-sm text-white/70 mt-0.5">{dashboard.desc}</p>
+              <motion.h3
+                className="text-xl font-bold text-white"
+                initial={{ x: -20, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
+                {dashboard.title}
+              </motion.h3>
+              <motion.p
+                className="text-sm text-white/70 mt-0.5"
+                initial={{ x: -20, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+              >
+                {dashboard.desc}
+              </motion.p>
             </div>
           </div>
 
-          <ul className={`space-y-2 mb-6 text-sm ${dashboard.accent}`}>
+          <ul className={`space-y-2 mb-6 text-sm ${dashboard.accent} flex-1 min-h-[140px]`}>
             {dashboard.features.map((f, i) => (
-              <li key={i} className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
+              <motion.li
+                key={i}
+                className="flex items-center gap-2"
+                initial={{ x: -20, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 * i }}
+                whileHover={{ x: 5, scale: 1.05 }}
+              >
+                <motion.span
+                  className="w-1.5 h-1.5 rounded-full bg-current opacity-80"
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                />
                 {f}
-              </li>
+              </motion.li>
             ))}
           </ul>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ 
+              scale: 1.08, 
+              x: 5,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+            }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setModalOpen(true)}
-            className={`w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r ${dashboard.btnGradient} flex items-center justify-center gap-2 shadow-lg`}
+            className={`mt-auto shrink-0 w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r ${dashboard.btnGradient} flex items-center justify-center gap-2 shadow-lg relative overflow-hidden group/btn gradient-shift`}
           >
-            Login as {dashboard.id === 'student' ? 'Student' : dashboard.id === 'tpo' ? 'TPO' : 'Alumni'}
-            <ArrowRight className="w-4 h-4" />
+            <motion.span
+              className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0"
+              animate={{
+                x: ['-100%', '100%'],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 1,
+              }}
+            />
+            <span className="relative z-10">Login as {dashboard.id === 'student' ? 'Student' : dashboard.id === 'tpo' ? 'TPO' : 'Alumni'}</span>
+            <motion.div
+              className="relative z-10"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <ArrowRight className="w-4 h-4" />
+            </motion.div>
           </motion.button>
         </div>
       </motion.div>
@@ -230,118 +397,269 @@ export default function Landing() {
     navigate(`/${data.user.role}`, { replace: true })
   }
 
+  // Text reveal animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+      },
+    },
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/40 to-slate-900 text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden relative">
       {/* Hero */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-16">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
-        </div>
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-16 z-10">
+        {/* Subtle floating glow behind title */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none flex items-center justify-center"
+          aria-hidden
+        >
+          <motion.div
+            className="w-[min(80vw,400px)] h-64 rounded-full bg-cyan-500/20 blur-[80px]"
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.4, 0.7, 0.4],
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
 
         <motion.div
           className="relative z-10 max-w-4xl mx-auto text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
-            <Rocket className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm font-medium text-white/90">Next-Gen Placement Management</span>
-          </div>
+          {/* Animated title with gentle float */}
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold mb-4 tracking-tight drop-shadow-[0_0_30px_rgba(56,189,248,0.5)]"
+            variants={itemVariants}
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <motion.span
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, type: 'spring', stiffness: 100 }}
+            >
+              Placement
+            </motion.span>
+            <motion.span
+              className="text-cyan-400 drop-shadow-[0_0_40px_rgba(56,189,248,0.8)] inline-block"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.5, type: 'spring', stiffness: 200 }}
+              whileHover={{ scale: 1.08, rotate: [0, -3, 3, 0], transition: { duration: 0.4 } }}
+            >
+              Pro
+            </motion.span>
+            <motion.span
+              className="inline-block ml-2"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            >
+              <Sparkles className="w-8 h-8 md:w-12 md:h-12 text-cyan-400 inline-block" />
+            </motion.span>
+          </motion.h1>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
-            Placement<span className="text-cyan-400">Pro</span>
-          </h1>
+          <motion.p
+            className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]"
+            variants={itemVariants}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            Transform your campus placements with{' '}
+            <motion.span
+              className="text-cyan-300 font-semibold"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              AI-powered insights
+            </motion.span>
+            , streamlined processes, and real-time collaboration between students, TPO, and alumni.
+          </motion.p>
 
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-            Transform your campus placements with AI-powered insights, streamlined processes, and
-            real-time collaboration between students, TPO, and alumni.
-          </p>
-
-          <div className="flex flex-wrap gap-4 justify-center mb-16">
+          <motion.div
+            className="flex flex-wrap gap-4 justify-center mb-16"
+            variants={itemVariants}
+          >
             <motion.a
               href="#dashboards"
-              whileHover={{ scale: 1.05 }}
+              className="group/btn px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white flex items-center gap-2 shadow-lg shadow-cyan-500/25 relative overflow-hidden"
+              whileHover={{ scale: 1.05, y: -4, boxShadow: '0 20px 40px rgba(56, 189, 248, 0.35)' }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white flex items-center gap-2 shadow-lg shadow-cyan-500/25"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1, type: 'spring', stiffness: 100 }}
             >
-              Get Started
-              <ArrowRight className="w-5 h-5" />
+              <span className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/btn:translate-x-[200%] transition-transform duration-500" />
+              <span className="relative z-10 flex items-center gap-2">
+                Get Started
+                <motion.span
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </motion.span>
+              </span>
             </motion.a>
             <motion.a
               href="#why-choose"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 rounded-xl font-semibold bg-white/5 border border-white/20 text-white flex items-center gap-2 hover:bg-white/10"
+              className="px-8 py-4 rounded-xl font-semibold bg-white/5 border border-white/20 text-white flex items-center gap-2 hover:bg-white/10 backdrop-blur-xl"
+              whileHover={{ scale: 1.1, y: -5, borderColor: 'rgba(56, 189, 248, 0.5)' }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.2, type: 'spring', stiffness: 100 }}
             >
-              <Play className="w-5 h-5" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              >
+                <Play className="w-5 h-5" />
+              </motion.div>
               Watch Demo
             </motion.a>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
+            variants={containerVariants}
+          >
             {[
               { value: '10K+', label: 'Students' },
               { value: '500+', label: 'Companies' },
               { value: '95%', label: 'Placement Rate' },
               { value: '₹15L', label: 'Avg. Package' },
             ].map((s, i) => (
-              <motion.div
-                key={s.label}
-                className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-              >
-                <div className="text-2xl md:text-3xl font-bold text-white">{s.value}</div>
-                <div className="text-sm text-white/60 mt-0.5">{s.label}</div>
-              </motion.div>
+              <AnimatedCounter key={s.label} value={s.value} label={s.label} delay={0.3 + i * 0.1} />
             ))}
-          </div>
+          </motion.div>
 
           <motion.div
             className="mt-16 flex flex-col items-center gap-2 text-white/50"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.8 }}
           >
-            <span className="text-sm">Scroll to explore</span>
-            <ChevronDown className="w-6 h-6" />
+            <motion.span
+              className="text-sm"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+            >
+              Scroll to explore
+            </motion.span>
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <ChevronDown className="w-6 h-6" />
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
 
       {/* Why Choose PlacementPro */}
-      <section id="why-choose" className="relative py-24 px-6 scroll-mt-20">
+      <section id="why-choose" className="relative py-24 px-6 scroll-mt-20 z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.8, type: 'spring' }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Choose PlacementPro?</h2>
-            <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            <motion.h2
+              className="text-4xl md:text-5xl font-bold mb-4"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              Why Choose{' '}
+              <motion.span
+                className="text-cyan-400"
+                animate={{ textShadow: [
+                  '0 0 20px rgba(56,189,248,0.5)',
+                  '0 0 40px rgba(56,189,248,0.8)',
+                  '0 0 20px rgba(56,189,248,0.5)',
+                ] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                PlacementPro?
+              </motion.span>
+            </motion.h2>
+            <motion.p
+              className="text-lg text-white/70 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
               Everything you need to manage campus placements efficiently and effectively
-            </p>
+            </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {WHY_CHOOSE.map((item, i) => (
               <motion.div
                 key={item.title}
-                className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 hover:bg-white/10 transition-colors"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
+                className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-6 hover:bg-white/15 hover:border-cyan-400/30 transition-all shadow-lg shadow-black/20 relative overflow-hidden group"
+                initial={{ opacity: 0, y: 50, rotateX: -20 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: i * 0.1, duration: 0.6, type: 'spring', stiffness: 100 }}
+                whileHover={{ scale: 1.05, y: -8, rotateY: 5, z: 50 }}
+                style={{ transformStyle: 'preserve-3d' }}
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
-                  <item.icon className="w-6 h-6" />
+                {/* Hover glow effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  animate={{
+                    backgroundPosition: ['0% 0%', '100% 100%'],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
+                />
+                
+                <div className="relative z-10">
+                  <motion.div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color} relative`}
+                    whileHover={{ scale: 1.1, rotate: [0, -8, 8, 0] }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <item.icon className="w-6 h-6" />
+                  </motion.div>
+                  <motion.h3
+                    className="text-xl font-bold text-white mb-2"
+                    whileHover={{ x: 5 }}
+                  >
+                    {item.title}
+                  </motion.h3>
+                  <motion.p
+                    className="text-white/70 text-sm leading-relaxed"
+                    initial={{ opacity: 0.7 }}
+                    whileHover={{ opacity: 1 }}
+                  >
+                    {item.desc}
+                  </motion.p>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                <p className="text-white/70 text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -349,30 +667,65 @@ export default function Landing() {
       </section>
 
       {/* Choose Your Dashboard */}
-      <section id="dashboards" className="relative py-24 px-6 scroll-mt-20">
+      <section id="dashboards" className="relative py-24 px-6 scroll-mt-20 z-10">
         <div className="max-w-6xl mx-auto">
           <motion.div
             className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.8, type: 'spring' }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Dashboard</h2>
-            <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            <motion.h2
+              className="text-4xl md:text-5xl font-bold mb-4"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.6, type: 'spring', stiffness: 80 }}
+            >
+              Choose Your{' '}
+              <motion.span
+                className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+                animate={{ backgroundPosition: ['0%', '100%'] }}
+                transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
+              >
+                Dashboard
+              </motion.span>
+            </motion.h2>
+            <motion.p
+              className="text-lg text-white/70 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
               Tailored experiences for students, TPO officers, and alumni
-            </p>
+            </motion.p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {DASHBOARDS.map((d) => (
-              <DashboardLoginCard key={d.id} dashboard={d} onSuccess={handleLoginSuccess} />
+          <motion.div
+            className="grid md:grid-cols-3 gap-8 items-stretch"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={containerVariants}
+          >
+            {DASHBOARDS.map((d, i) => (
+              <motion.div
+                key={d.id}
+                variants={itemVariants}
+                custom={i}
+                className="h-full"
+              >
+                <DashboardLoginCard dashboard={d} onSuccess={handleLoginSuccess} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-white/10 text-center text-white/50 text-sm">
+      <footer className="relative py-8 border-t border-white/10 text-center text-white/50 text-sm z-10 bg-slate-900/40 backdrop-blur-sm">
         <p>© {new Date().getFullYear()} PlacementPro. Campus Placement Management Platform.</p>
       </footer>
     </div>

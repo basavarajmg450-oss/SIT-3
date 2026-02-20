@@ -85,7 +85,13 @@ export default function LoginModal({ role, isOpen, onClose, onSubmit, onRegister
       const { authAPI } = await import('../../services/api')
       const { data } = await authAPI.forgotPassword({ email, role })
       if (data.success) {
-        toast.success('If an account exists, a reset link has been sent to your email.')
+        if (data.resetLink) {
+          toast.success('Opening reset page... (email not configured in dev)')
+          setShowForgot(false)
+          window.location.href = data.resetLink
+          return
+        }
+        toast.success(data.message || 'If an account exists, a reset link has been sent to your email.')
         setShowForgot(false)
       }
     } catch {

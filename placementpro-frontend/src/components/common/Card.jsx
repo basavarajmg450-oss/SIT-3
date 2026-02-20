@@ -7,7 +7,7 @@ export default function Card({ children, className = '', hover = false, onClick,
 
   return (
     <Component
-      className={`bg-white rounded-2xl shadow-sm border border-gray-100 ${hover || onClick ? 'cursor-pointer' : ''} ${gradient ? 'overflow-hidden' : ''} ${className}`}
+      className={`bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 ${hover || onClick ? 'cursor-pointer' : ''} ${gradient ? 'overflow-hidden' : ''} ${className}`}
       {...motionProps}
     >
       {gradient && (
@@ -30,15 +30,15 @@ export function StatCard({ icon, label, value, change, color = 'indigo', gradien
 
   return (
     <motion.div
-      className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+      className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/10"
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm font-medium text-slate-400 mb-1">{label}</p>
+          <p className="text-3xl font-bold text-white">{value}</p>
           {change !== undefined && (
-            <p className={`text-xs font-medium mt-1 ${change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            <p className={`text-xs font-medium mt-1 ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% from last month
             </p>
           )}

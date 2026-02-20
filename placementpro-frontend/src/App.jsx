@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import SharedBackground from './components/common/SharedBackground'
 import Landing from './pages/Landing'
 import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/StudentDashboard'
@@ -17,6 +18,8 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <BrowserRouter>
+            <SharedBackground />
+            <div className="relative z-10 min-h-screen">
             <Toaster
               position="top-right"
               toastOptions={{
@@ -67,6 +70,7 @@ export default function App() {
               />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </div>
           </BrowserRouter>
         </AuthProvider>
       </ThemeProvider>

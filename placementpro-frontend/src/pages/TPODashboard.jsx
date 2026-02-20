@@ -83,7 +83,7 @@ function Home() {
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold text-gray-900"
+            className="text-2xl font-bold text-white"
           >
             TPO Dashboard 👨‍💼
           </motion.h1>
@@ -91,7 +91,7 @@ function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-gray-500 text-sm mt-0.5"
+            className="text-slate-400 text-sm mt-0.5"
           >
             Manage drives, students, and placements
           </motion.p>
@@ -132,14 +132,14 @@ function Home() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">Recent Drives</h2>
+              <h2 className="font-semibold text-white">Recent Drives</h2>
               <motion.button
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.4 }}
                 onClick={loadData}
-                className="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded-lg"
+                className="text-slate-400 hover:text-cyan-400 transition-colors p-1 rounded-lg"
               >
                 <RefreshCw className="w-4 h-4" />
               </motion.button>
@@ -153,16 +153,16 @@ function Home() {
                   transition={{ delay: 0.35 + i * 0.05 }}
                   whileHover={{ x: 4, backgroundColor: '#f9fafb' }}
                   onClick={() => navigate(`/tpo/drives`)}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer border border-transparent hover:border-indigo-100 transition-all"
+                  className="flex items-center justify-between p-3 bg-white/10 rounded-xl cursor-pointer border border-transparent hover:border-white/20 transition-all"
                 >
                   <div>
-                    <p className="font-medium text-gray-900 text-sm">{drive.company}</p>
-                    <p className="text-xs text-gray-500">{drive.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Deadline: {formatDate(drive.deadline)}</p>
+                    <p className="font-medium text-white text-sm">{drive.company}</p>
+                    <p className="text-xs text-slate-400">{drive.title}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Deadline: {formatDate(drive.deadline)}</p>
                   </div>
                   <div className="text-right">
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(drive.status)}`}>{drive.status}</span>
-                    <p className="text-xs text-gray-500 mt-1">{drive.applicationCount || 0} applied</p>
+                    <p className="text-xs text-slate-400 mt-1">{drive.applicationCount || 0} applied</p>
                   </div>
                 </motion.div>
               ))}
@@ -171,7 +171,7 @@ function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-center text-gray-400 text-sm py-6"
+                  className="text-center text-slate-400 text-sm py-6"
                 >
                   No drives yet. Create your first drive!
                 </motion.p>
@@ -186,10 +186,10 @@ function Home() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
         >
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 mb-4">
               <Zap className="w-5 h-5 text-amber-500" />
-              <h2 className="font-semibold text-gray-900">Quick Actions</h2>
+              <h2 className="font-semibold text-white">Quick Actions</h2>
             </div>
             <div className="space-y-2">
               {quickActions.map((action, i) => {
@@ -204,7 +204,7 @@ function Home() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleQuickAction(action)}
                     disabled={action.type === 'export' && exporting}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all text-left group border border-transparent hover:border-indigo-100"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all text-left group border border-transparent hover:border-white/20"
                   >
                     <motion.div
                       className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-md`}
@@ -212,7 +212,7 @@ function Home() {
                     >
                       <Icon className="w-5 h-5" />
                     </motion.div>
-                    <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-700 transition-colors flex-1">
+                    <span className="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition-colors flex-1">
                       {action.label}
                     </span>
                     {action.type === 'export' && exporting ? (
@@ -223,7 +223,7 @@ function Home() {
                       />
                     ) : (
                       <motion.span
-                        className="text-gray-300 group-hover:text-indigo-500"
+                        className="text-gray-300 group-hover:text-cyan-400"
                         initial={false}
                         whileHover={{ x: 4 }}
                       >
@@ -273,32 +273,32 @@ function ManageDrives() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Drives 💼</h1>
+        <h1 className="text-2xl font-bold text-white">Manage Drives 💼</h1>
         <button onClick={() => setShowCreate(!showCreate)} className="btn-primary text-sm flex items-center gap-2">
           <Plus className="w-4 h-4" /> {showCreate ? 'Cancel' : 'Create Drive'}
         </button>
       </div>
 
       {showCreate && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 border border-gray-100">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
           <CreateDrive onSuccess={() => { setShowCreate(false); loadDrives() }} />
         </motion.div>
       )}
 
       {loading ? (
-        <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-24 bg-white rounded-2xl border border-gray-100 animate-pulse" />)}</div>
+        <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-24 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 animate-pulse" />)}</div>
       ) : (
         <div className="space-y-3">
           {drives.map((drive, i) => (
-            <motion.div key={drive._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setSelected(selected === drive._id ? null : drive._id)}>
+            <motion.div key={drive._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+              <div className="p-4 cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setSelected(selected === drive._id ? null : drive._id)}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 font-bold">{drive.company[0]}</div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-sm">{drive.title}</h3>
+                      <h3 className="font-semibold text-white text-sm">{drive.title}</h3>
                       <p className="text-indigo-600 text-sm font-medium">{drive.company}</p>
-                      <div className="flex gap-3 text-xs text-gray-500 mt-0.5">
+                      <div className="flex gap-3 text-xs text-slate-400 mt-0.5">
                         <span>CGPA ≥ {drive.minCGPA}</span>
                         <span>{drive.applicationCount} applied</span>
                         <span>Deadline: {formatDate(drive.deadline)}</span>
@@ -307,17 +307,17 @@ function ManageDrives() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(drive.status)}`}>{drive.status}</span>
-                    <motion.div animate={{ rotate: selected === drive._id ? 180 : 0 }}><ChevronDown className="w-4 h-4 text-gray-400" /></motion.div>
+                    <motion.div animate={{ rotate: selected === drive._id ? 180 : 0 }}><ChevronDown className="w-4 h-4 text-slate-400" /></motion.div>
                   </div>
                 </div>
               </div>
               {selected === drive._id && (
-                <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
+                <div className="px-4 pb-4 border-t border-white/10 pt-3 space-y-3">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                    <div className="bg-gray-50 rounded-lg p-2"><p className="text-gray-500">Salary</p><p className="font-semibold text-gray-800">{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p></div>
-                    <div className="bg-gray-50 rounded-lg p-2"><p className="text-gray-500">Branches</p><p className="font-semibold text-gray-800">{drive.eligibleBranches.join(', ')}</p></div>
-                    <div className="bg-gray-50 rounded-lg p-2"><p className="text-gray-500">Max Backlogs</p><p className="font-semibold text-gray-800">{drive.maxBacklogs}</p></div>
-                    <div className="bg-gray-50 rounded-lg p-2"><p className="text-gray-500">Selected</p><p className="font-semibold text-gray-800">{drive.selectedCount || 0}</p></div>
+                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Salary</p><p className="font-semibold text-slate-100">{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p></div>
+                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Branches</p><p className="font-semibold text-slate-100">{drive.eligibleBranches.join(', ')}</p></div>
+                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Max Backlogs</p><p className="font-semibold text-slate-100">{drive.maxBacklogs}</p></div>
+                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Selected</p><p className="font-semibold text-slate-100">{drive.selectedCount || 0}</p></div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => navigate(`/tpo/students?driveId=${drive._id}`)} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors font-medium">View Eligible Students</button>
@@ -328,7 +328,7 @@ function ManageDrives() {
               )}
             </motion.div>
           ))}
-          {drives.length === 0 && <div className="text-center py-10"><div className="text-4xl mb-3">💼</div><p className="text-gray-500">No drives created yet</p></div>}
+          {drives.length === 0 && <div className="text-center py-10"><div className="text-4xl mb-3">💼</div><p className="text-slate-400">No drives created yet</p></div>}
         </div>
       )}
     </div>
@@ -345,23 +345,23 @@ function AuditLogs() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-900">Audit Logs 📜</h1>
+      <h1 className="text-2xl font-bold text-white">Audit Logs 📜</h1>
       {loading ? <div className="text-center py-10"><motion.div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-500 rounded-full mx-auto" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>{['Action', 'User', 'Method', 'Path', 'Time'].map((h) => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-600">{h}</th>)}</tr>
+            <thead className="bg-white/10 border-b border-white/10">
+              <tr>{['Action', 'User', 'Method', 'Path', 'Time'].map((h) => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-300">{h}</th>)}</tr>
             </thead>
             <tbody>
               {logs.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-8 text-gray-400">No audit logs yet</td></tr>
+                <tr><td colSpan={5} className="text-center py-8 text-slate-400">No audit logs yet</td></tr>
               ) : logs.map((log) => (
-                <tr key={log.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <tr key={log.id} className="border-b border-white/5 hover:bg-white/10 transition-colors">
                   <td className="px-4 py-3"><span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">{log.action}</span></td>
-                  <td className="px-4 py-3 text-gray-600 text-xs">{log.userEmail}</td>
+                  <td className="px-4 py-3 text-slate-300 text-xs">{log.userEmail}</td>
                   <td className="px-4 py-3"><span className={`text-xs font-bold ${log.method === 'POST' ? 'text-emerald-600' : log.method === 'PUT' ? 'text-amber-600' : 'text-blue-600'}`}>{log.method}</span></td>
-                  <td className="px-4 py-3 text-gray-500 text-xs font-mono">{log.path}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{new Date(log.timestamp).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-slate-400 text-xs font-mono">{log.path}</td>
+                  <td className="px-4 py-3 text-slate-400 text-xs">{new Date(log.timestamp).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -382,9 +382,9 @@ function StudentsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-900">Students 🎓</h1>
+      <h1 className="text-2xl font-bold text-white">Students 🎓</h1>
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1.5 block">Select Drive</label>
+        <label className="text-sm font-medium text-slate-200 mb-1.5 block">Select Drive</label>
         <select value={driveId} onChange={(e) => setDriveId(e.target.value)} className="w-full max-w-xs px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all">
           <option value="">Select a drive...</option>
           {drives.map((d) => <option key={d._id} value={d._id}>{d.company} - {d.title}</option>)}
@@ -399,7 +399,7 @@ export default function TPODashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="lg:ml-64 pt-16">
@@ -408,10 +408,10 @@ export default function TPODashboard() {
             <Route path="/" element={<Home />} />
             <Route path="/drives" element={<ManageDrives />} />
             <Route path="/students" element={<StudentsPage />} />
-            <Route path="/analytics" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Analytics 📊</h1><AnalyticsDashboard /></div>} />
+            <Route path="/analytics" element={<div><h1 className="text-2xl font-bold text-white mb-5">Analytics 📊</h1><AnalyticsDashboard /></div>} />
             <Route path="/audit-logs" element={<AuditLogs />} />
-            <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Applications</h1><p className="text-gray-500">Select a drive from Manage Drives to view applications.</p></div>} />
-            <Route path="/interviews" element={<div><h1 className="text-2xl font-bold text-gray-900 mb-5">Interviews 🎤</h1><InterviewCalendar /></div>} />
+            <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-white mb-5">Applications</h1><p className="text-slate-400">Select a drive from Manage Drives to view applications.</p></div>} />
+            <Route path="/interviews" element={<div><h1 className="text-2xl font-bold text-white mb-5">Interviews 🎤</h1><InterviewCalendar /></div>} />
           </Routes>
         </div>
       </main>

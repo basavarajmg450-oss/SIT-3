@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../../context/AuthContext'
 import { motion } from 'framer-motion'
 import { studentAPI } from '../../services/api'
 import toast from 'react-hot-toast'
@@ -7,8 +8,14 @@ import { Target, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
 export default function SkillGapAnalysis() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuth()
 
   useEffect(() => {
+    if (!authLoading && !user) {
+      // don't attempt to load skill gap when not authenticated
+      setLoading(false)
+      return
+    }
     loadSkillGap()
   }, [])
 

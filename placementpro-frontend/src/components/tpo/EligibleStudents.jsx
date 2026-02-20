@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { tpoAPI } from '../../services/api'
 import toast from 'react-hot-toast'
-import { Search, ChevronDown, Mail, GraduationCap } from 'lucide-react'
+import { Search, ChevronDown, Mail, GraduationCap, Calendar, Clock } from 'lucide-react'
 
 export default function EligibleStudents({ driveId, driveName }) {
   const [students, setStudents] = useState([])
@@ -12,6 +12,11 @@ export default function EligibleStudents({ driveId, driveName }) {
   const [selected, setSelected] = useState([])
   const [notifying, setNotifying] = useState(false)
   const [statusUpdate, setStatusUpdate] = useState({ applicationId: '', status: '', feedback: '' })
+  const [scheduleOpen, setScheduleOpen] = useState(false)
+  const [scheduleStudent, setScheduleStudent] = useState(null)
+  const [scheduleDate, setScheduleDate] = useState('')
+  const [scheduleTime, setScheduleTime] = useState('')
+  const [scheduling, setScheduling] = useState(false)
 
   useEffect(() => {
     if (driveId) loadStudents()
@@ -61,6 +66,40 @@ export default function EligibleStudents({ driveId, driveName }) {
       toast.error('Failed to send notifications')
     } finally {
       setNotifying(false)
+    }
+  }
+
+  const openSchedule = (student) => {
+    setScheduleStudent(student)
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    setScheduleDate(tomorrow.toISOString().split('T')[0])
+    setScheduleTime('10:00')
+    setScheduleOpen(true)
+  }
+
+  const handleScheduleSubmit = async () => {
+    if (!scheduleStudent) return
+    setScheduling(true)
+    try {
+      const payload = {
+        driveId,
+        studentId: scheduleStudent.userId?.toString() || scheduleStudent._id,
+        date: scheduleDate,
+        time: scheduleTime,
+        type: 'Interview',
+        mode: 'Online',
+      }
+      const { data } = await tpoAPI.scheduleInterview(payload)
+      if (data.success) {
+        toast.success(data.message || 'Interview scheduled')
+        setScheduleOpen(false)
+        loadStudents()
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to schedule interview')
+    } finally {
+      setScheduling(false)
     }
   }
 
@@ -135,7 +174,12 @@ export default function EligibleStudents({ driveId, driveName }) {
                 checked={selected.includes(student.userId?.toString())}
                 onChange={(e) => {
                   const userId = student.userId?.toString()
-                  setSelected((prev) => e.target.checked ? [...prev, userId] : prev.filter((id) => id !== userId))
+                  if (e.target.checked) {
+                    // single-select: selecting one student clears others
+                    setSelected([userId])
+                  } else {
+                    setSelected([])
+                  }
                 }}
                 className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
@@ -166,6 +210,9 @@ export default function EligibleStudents({ driveId, driveName }) {
                   {student.skills.length > 2 && <span className="text-xs text-gray-400">+{student.skills.length - 2}</span>}
                 </div>
               )}
+              <div className="flex items-center gap-2 ml-3">
+                <button onClick={() => openSchedule(student)} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors font-medium">Schedule</button>
+              </div>
             </div>
           </motion.div>
         ))}
@@ -177,6 +224,28 @@ export default function EligibleStudents({ driveId, driveName }) {
           </div>
         )}
       </div>
+      {scheduleOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg">
+            <h3 className="font-semibold text-gray-800 mb-3">Schedule Interview</h3>
+            <p className="text-sm text-gray-500 mb-4">Student: <span className="font-medium">{scheduleStudent?.name || scheduleStudent?.regNumber}</span></p>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Date</label>
+                <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-600 block mb-1">Time</label>
+                <input type="time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => setScheduleOpen(false)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm">Cancel</button>
+              <button disabled={scheduling} onClick={handleScheduleSubmit} className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm">{scheduling ? 'Scheduling...' : 'Schedule'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
