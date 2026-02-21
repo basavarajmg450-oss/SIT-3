@@ -1,28 +1,18 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-// Theme context for the application
+import { createContext, useContext, useEffect } from 'react'
+// Theme context - Dark theme only (permanent)
 
 const ThemeContext = createContext(null)
 
 export const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('pp_theme')
-    return saved === 'dark'
-  })
+  // Always use dark theme permanently
+  const isDark = true
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('pp_theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('pp_theme', 'light')
-    }
-  }, [isDark])
-
-  const toggleTheme = () => setIsDark((prev) => !prev)
+    document.documentElement.classList.add('dark')
+  }, [])
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark }}>
       {children}
     </ThemeContext.Provider>
   )

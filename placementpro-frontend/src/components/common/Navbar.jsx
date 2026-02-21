@@ -1,15 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { notificationAPI } from '../../services/api'
 import { timeAgo } from '../../utils/helpers'
-import { Bell, Moon, Sun, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
+import { Bell, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
 
 export default function Navbar({ onMenuClick, sidebarOpen }) {
   const { user, profile, logout } = useAuth()
-  const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -71,14 +69,10 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
   }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b transition-all duration-300 ${isDark
-      ? 'bg-slate-900/80 border-white/10 shadow-lg'
-      : 'bg-white/80 border-slate-200 shadow-md'
-      }`}>
+    <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b bg-slate-900/80 border-white/10 shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <button onClick={onMenuClick} className={`p-2 rounded-xl transition-colors lg:hidden ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-800'
-            }`}>
+          <button onClick={onMenuClick} className="p-2 rounded-xl transition-colors lg:hidden hover:bg-white/10 text-white">
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex items-center gap-2">
@@ -98,23 +92,14 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
               <Plus className="w-4 h-4" /> New Drive
             </button>
           )}
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-800'
-              }`}
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-          </button>
 
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => setShowNotifs(!showNotifs)}
-              className={`relative p-2 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-800'
-                }`}
+              className="relative p-2 rounded-xl transition-colors hover:bg-white/10 text-white"
               aria-label="Notifications"
             >
-              <Bell className={`w-5 h-5 ${isDark ? 'text-slate-200' : 'text-slate-600'}`} />
+              <Bell className="w-5 h-5 text-slate-200" />
               {unreadCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
@@ -133,11 +118,10 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className={`absolute right-0 top-12 w-80 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 ${isDark ? 'bg-slate-900/95 border-white/10' : 'bg-white border-slate-200'
-                    }`}
+                  className="absolute right-0 top-12 w-80 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 bg-slate-900/95 border-white/10"
                 >
-                  <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
-                    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>Notifications</h3>
+                  <div className="flex items-center justify-between p-4 border-b border-white/10">
+                    <h3 className="font-semibold text-white">Notifications</h3>
                     {unreadCount > 0 && (
                       <button onClick={handleMarkAllRead} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">
                         Mark all read
@@ -185,7 +169,7 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                 {profile?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="hidden md:block text-left">
-                <p className={`text-sm font-semibold leading-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                <p className="text-sm font-semibold leading-tight text-white">
                   {profile?.name || user?.email?.split('@')[0] || 'User'}
                 </p>
                 <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${roleBadge[user?.role]}`}>
@@ -202,17 +186,15 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className={`absolute right-0 top-12 w-52 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 ${isDark ? 'bg-slate-900/95 border-white/10' : 'bg-white border-slate-200'
-                    }`}
+                  className="absolute right-0 top-12 w-52 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 bg-slate-900/95 border-white/10"
                 >
-                  <div className={`p-3 border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
-                    <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>{profile?.name || 'User'}</p>
+                  <div className="p-3 border-b border-white/10">
+                    <p className="text-sm font-semibold text-white">{profile?.name || 'User'}</p>
                     <p className="text-xs text-slate-500">{user?.email}</p>
                   </div>
                   <button
                     onClick={() => { setShowProfile(false); navigate(user?.role === 'student' ? '/student' : user?.role === 'tpo' ? '/tpo' : '/alumni') }}
-                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-600 hover:bg-slate-50'
-                      }`}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors text-slate-200 hover:bg-white/10"
                   >
                     <User className="w-4 h-4" />
                     Dashboard

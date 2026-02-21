@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import toast from 'react-hot-toast'
 import { authAPI } from '../services/api'
 
 const AuthContext = createContext(null)
@@ -8,6 +9,35 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(() => localStorage.getItem('pp_token'))
+
+  // Check backend health on mount
+  useEffect(() => {
+    const checkBackendHealth = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/health`, {
+          method: 'GET',
+          timeout: 3000
+        })
+        if (!response.ok) {
+          throw new Error('Backend unavailable')
+        }
+      } catch (error) {
+        toast.error(
+          'Backend not running. Run: cd placementpro-backend && npm run dev',
+          {
+            duration: 0, // Don't auto-dismiss
+            icon: '⚠️',
+            style: {
+              background: '#fee2e2',
+              color: '#991b1b',
+              border: '2px solid #dc2626',
+            },
+          }
+        )
+      }
+    }
+    checkBackendHealth()
+  }, [])
 
   const loadUser = useCallback(async () => {
     const storedToken = localStorage.getItem('pp_token')
