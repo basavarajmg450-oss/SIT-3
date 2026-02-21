@@ -1,7 +1,8 @@
 {
-  "buildCommand": "cd placementpro-frontend && npm install && npm run build",
+  "buildCommand": "cd placementpro-frontend && npm install && VITE_API_URL=https://sit-3-kv64.onrender.com/api npm run build",
   "outputDirectory": "placementpro-frontend/dist",
   "framework": "vite",
+  "nodejs": "18.x",
   "headers": [
     {
       "source": "/assets/(.*)",
