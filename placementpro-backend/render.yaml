@@ -3,48 +3,51 @@ services:
     name: placementpro-backend
     env: node
     plan: free
-    buildCommand: cd placementpro-backend && npm install
-    startCommand: cd placementpro-backend && npm start
-    autoDeploy: false
+    region: oregon
+
+    # Build configuration
+    buildCommand: npm install
+    startCommand: npm start
+
+    # Auto deploy on push
+    autoDeploy: true
+
+    # Health check
+    healthCheckPath: /api/health
+
+    # Environment variables
     envVars:
-      - key: PORT
-        value: 10000
-        scope: run_and_build
       - key: NODE_ENV
         value: production
-        scope: run_and_build
+      - key: PORT
+        value: 10000
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_FROM
+        value: PlacementPro <noreply@placementpro.com>
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 5000
+      - key: OTP_EXPIRY_MINUTES
+        value: 10
+
+      # Sensitive variables - set these in Render dashboard
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
-      - key: JWT_EXPIRES_IN
-        value: 7d
-        scope: run_and_build
       - key: GEMINI_API_KEY
         sync: false
-      - key: EMAIL_HOST
-        value: smtp.gmail.com
-        scope: run_and_build
-      - key: EMAIL_PORT
-        value: 587
-        scope: run_and_build
       - key: EMAIL_USER
         sync: false
       - key: EMAIL_PASSWORD
         sync: false
-      - key: EMAIL_FROM
-        value: PlacementPro <noreply@placementpro.com>
-        scope: run_and_build
       - key: FRONTEND_URL
         sync: false
-      - key: RATE_LIMIT_WINDOW_MS
-        value: 900000
-        scope: run_and_build
-      - key: RATE_LIMIT_MAX
-        value: 5000
-        scope: run_and_build
-      - key: OTP_EXPIRY_MINUTES
-        value: 10
-        scope: run_and_build
       - key: VITE_API_URL
         sync: false
