@@ -21,7 +21,6 @@ const tpoLinks = [
   { to: '/tpo/students', label: 'Students', icon: '🎓' },
   { to: '/tpo/interviews', label: 'Interviews', icon: '🎤' },
   { to: '/tpo/analytics', label: 'Analytics', icon: '📊' },
-  { to: '/tpo/audit-logs', label: 'Audit Logs', icon: '📜' },
 ]
 
 const alumniLinks = [

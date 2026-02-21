@@ -206,7 +206,7 @@ export default function LoginModal({ role, isOpen, onClose, onSubmit, onRegister
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Password</label>
+                    <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-white' : 'text-slate-700'}`}>Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input

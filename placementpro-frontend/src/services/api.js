@@ -32,6 +32,8 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
+  sendOTP: (data) => api.post('/auth/send-otp', data),
+  verifyOTP: (data) => api.post('/auth/verify-otp', data),
   forgotPassword: (data) => api.post('/auth/forgot-password', data),
   resetPassword: (data) => api.post('/auth/reset-password', data),
 }
@@ -45,6 +47,7 @@ export const studentAPI = {
   getApplications: (params) => api.get('/student/applications', { params }),
   getSkillGap: () => api.get('/student/skill-gap'),
   bookMentorship: (data) => api.post('/student/book-mentorship', data),
+  submitAlumniReview: (data) => api.post('/student/alumni-review', data),
 }
 
 export const tpoAPI = {

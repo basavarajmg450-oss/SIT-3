@@ -1,5 +1,39 @@
 # PlacementPro - Quick Start
 
+---
+
+## ⚠️ If you see "Connection Failed" or "ERR_CONNECTION_REFUSED"
+
+This means **no server is running** on the port you're trying to open (usually `http://localhost:3000`).
+
+**Do this:**
+
+1. **Start the backend first** (Terminal 1):
+   ```bash
+   cd placementpro-backend
+   npm run dev
+   ```
+   Wait until you see: `🚀 PlacementPro Server running on port 5000`
+
+2. **Start the frontend** (Terminal 2):
+   ```bash
+   cd placementpro-frontend
+   npm run dev
+   ```
+   Wait until you see: `Local: http://localhost:3000`
+
+3. **Open in your browser:** http://localhost:3000  
+   (Use your normal browser, e.g. Chrome or Edge, not an in-app browser if it gives connection errors.)
+
+**Or from project root (after one-time setup):**
+```bash
+npm install
+npm run dev
+```
+This starts both backend and frontend together. Then open http://localhost:3000.
+
+---
+
 ## If login fails, follow these steps in order:
 
 ### Step 1: Set up MongoDB
@@ -96,7 +130,9 @@ Open http://localhost:3000 in your browser.
 
 | Error | Fix |
 |-------|-----|
-| "Backend not running" | Run `npm run dev` in `placementpro-backend` |
+| **Connection Failed / ERR_CONNECTION_REFUSED** | Start **backend** first (`cd placementpro-backend` → `npm run dev`), then **frontend** (`cd placementpro-frontend` → `npm run dev`). Open http://localhost:3000 in your browser. |
+| "Backend not running" | Run `npm run dev` in `placementpro-backend` and keep that terminal open. |
 | "Server error. Check MongoDB" | Fix MONGODB_URI in `.env`, run `npm run seed` |
 | "Invalid email or password" | Run `npm run seed` again to create users |
 | MongoClientError / connection timeout | Check Atlas IP whitelist (allow 0.0.0.0/0 for testing) |
+| Page loads but login/API fails | Backend must be running on port 5000. Restart `placementpro-backend` with `npm run dev`. |

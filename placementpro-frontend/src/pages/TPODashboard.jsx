@@ -13,14 +13,13 @@ import EligibleStudents from '../components/tpo/EligibleStudents'
 import InterviewCalendar from '../components/tpo/InterviewCalendar'
 import toast from 'react-hot-toast'
 import { formatDate, getStatusColor, formatSalaryRange } from '../utils/helpers'
-import { Plus, Download, RefreshCw, ChevronDown, BarChart3, GraduationCap, FileText, ScrollText, Zap } from 'lucide-react'
+import { Plus, Download, RefreshCw, ChevronDown, BarChart3, GraduationCap, FileText, Zap } from 'lucide-react'
 
 const quickActions = [
   { label: 'Create Drive', icon: Plus, path: '/tpo/drives?create=1', color: 'indigo', gradient: 'from-indigo-500 to-purple-500' },
   { label: 'View Analytics', icon: BarChart3, path: '/tpo/analytics', color: 'purple', gradient: 'from-purple-500 to-pink-500' },
   { label: 'View Students', icon: GraduationCap, path: '/tpo/students', color: 'blue', gradient: 'from-blue-500 to-cyan-500' },
   { label: 'Export Report', icon: Download, type: 'export', color: 'emerald', gradient: 'from-emerald-500 to-teal-500' },
-  { label: 'Audit Logs', icon: ScrollText, path: '/tpo/audit-logs', color: 'gray', gradient: 'from-slate-500 to-gray-600' },
 ]
 
 function Home() {
@@ -346,44 +345,6 @@ function ManageDrives() {
   )
 }
 
-function AuditLogs() {
-  const { isDark } = useTheme()
-  const [logs, setLogs] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    tpoAPI.getAuditLogs({ limit: 50 }).then(({ data }) => { if (data.success) setLogs(data.logs) }).catch(() => { }).finally(() => setLoading(false))
-  }, [])
-
-  return (
-    <div className="space-y-4">
-      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Audit Logs 📜</h1>
-      {loading ? <div className="text-center py-10"><motion.div className={`w-8 h-8 border-2 border-t-indigo-500 rounded-full mx-auto ${isDark ? 'border-indigo-200' : 'border-slate-200'}`} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
-        <div className={`backdrop-blur-xl rounded-2xl border overflow-hidden shadow-sm transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200'}`}>
-          <table className="w-full text-sm">
-            <thead className={`border-b transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-slate-50 border-slate-100'}`}>
-              <tr>{['Action', 'User', 'Method', 'Path', 'Time'].map((h) => <th key={h} className={`text-left px-4 py-3 text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{h}</th>)}</tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-8 text-slate-400">No audit logs yet</td></tr>
-              ) : logs.map((log) => (
-                <tr key={log.id} className="border-b border-white/5 hover:bg-white/10 transition-colors">
-                  <td className="px-4 py-3"><span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">{log.action}</span></td>
-                  <td className="px-4 py-3 text-slate-300 text-xs">{log.userEmail}</td>
-                  <td className="px-4 py-3"><span className={`text-xs font-bold ${log.method === 'POST' ? 'text-emerald-600' : log.method === 'PUT' ? 'text-amber-600' : 'text-blue-600'}`}>{log.method}</span></td>
-                  <td className="px-4 py-3 text-slate-400 text-xs font-mono">{log.path}</td>
-                  <td className="px-4 py-3 text-slate-400 text-xs">{new Date(log.timestamp).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  )
-}
-
 function StudentsPage() {
   const { isDark } = useTheme()
   const [driveId, setDriveId] = useState(new URLSearchParams(window.location.search).get('driveId') || '')
@@ -428,7 +389,6 @@ export default function TPODashboard() {
             <Route path="/drives" element={<ManageDrives />} />
             <Route path="/students" element={<StudentsPage />} />
             <Route path="/analytics" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Analytics 📊</h1><AnalyticsDashboard /></div>} />
-            <Route path="/audit-logs" element={<AuditLogs />} />
             <Route path="/applications" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Applications</h1><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Select a drive from Manage Drives to view applications.</p></div>} />
             <Route path="/interviews" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Interviews 🎤</h1><InterviewCalendar /></div>} />
           </Routes>

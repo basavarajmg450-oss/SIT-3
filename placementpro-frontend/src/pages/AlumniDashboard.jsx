@@ -298,12 +298,18 @@ function InterviewReviews() {
         <div className="space-y-3">
           {reviews.map((r, i) => (
             <motion.div key={r._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className={`backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="flex justify-between mb-2">
-                <div><p className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{r.driveId?.company}</p><p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{r.type} Round</p></div>
-                <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(r.result)}`}>{r.result}</span>
+              <div className="flex justify-between items-start mb-2">
+                <p className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{r.studentName}</p>
+                <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ''}</span>
               </div>
-              {r.feedback && <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{r.feedback}</p>}
-              {r.rating && <div className="flex gap-1 mt-2">{[...Array(5)].map((_, idx) => <span key={idx} className={idx < r.rating ? 'text-amber-400' : 'text-gray-200'}>⭐</span>)}</div>}
+              {r.rating != null && (
+                <div className="flex gap-0.5 mb-2">
+                  {[1, 2, 3, 4, 5].map((idx) => (
+                    <span key={idx} className={idx <= r.rating ? 'text-amber-400' : isDark ? 'text-slate-600' : 'text-gray-200'}>⭐</span>
+                  ))}
+                </div>
+              )}
+              {r.comment && <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{r.comment}</p>}
             </motion.div>
           ))}
         </div>

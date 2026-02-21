@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/StudentDashboard'
 import TPODashboard from './pages/TPODashboard'
 import AlumniDashboard from './pages/AlumniDashboard'
+import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -46,7 +47,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/login" element={<Login />} />
                 <Route
                   path="/student/*"
                   element={

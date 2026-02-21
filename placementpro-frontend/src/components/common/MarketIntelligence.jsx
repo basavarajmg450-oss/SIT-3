@@ -35,7 +35,7 @@ export default function MarketIntelligence({ compact = false }) {
 
   if (!data) return null
 
-  const skills = data.topSkills || data.topSkills || []
+  const skills = data.topSkills || []
 
   return (
     <motion.div

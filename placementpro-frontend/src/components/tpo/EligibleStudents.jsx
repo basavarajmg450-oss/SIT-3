@@ -11,7 +11,7 @@ export default function EligibleStudents({ driveId, driveName }) {
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [selected, setSelected] = useState([])
+  const [selected, setSelected] = useState([]) // array of student IDs (userId or _id) for multi-select
   const [notifying, setNotifying] = useState(false)
   const [statusUpdate, setStatusUpdate] = useState({ applicationId: '', status: '', feedback: '' })
   const [scheduleOpen, setScheduleOpen] = useState(false)
@@ -84,12 +84,17 @@ export default function EligibleStudents({ driveId, driveName }) {
     if (!scheduleStudent) return
     setScheduling(true)
     try {
+      const studentId = getStudentId(scheduleStudent)
+      if (!studentId) {
+        toast.error('Invalid student. Please try again.')
+        return
+      }
       const payload = {
         driveId,
-        studentId: scheduleStudent.userId?.toString() || scheduleStudent._id,
+        studentId,
         date: scheduleDate,
         time: scheduleTime,
-        type: 'Interview',
+        type: 'Technical',
         mode: 'Online',
       }
       const { data } = await tpoAPI.scheduleInterview(payload)
@@ -104,6 +109,8 @@ export default function EligibleStudents({ driveId, driveName }) {
       setScheduling(false)
     }
   }
+
+  const getStudentId = (student) => (typeof student.userId === 'string' ? student.userId : student.userId?._id?.toString()) || student._id?.toString() || ''
 
   const getCGPAColor = (cgpa) => {
     if (cgpa >= 9) return 'text-emerald-600 bg-emerald-50'
@@ -174,14 +181,14 @@ export default function EligibleStudents({ driveId, driveName }) {
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
-                checked={selected.includes(student.userId?.toString())}
+                checked={selected.includes(getStudentId(student))}
                 onChange={(e) => {
-                  const userId = student.userId?.toString()
+                  const id = getStudentId(student)
+                  if (!id) return
                   if (e.target.checked) {
-                    // single-select: selecting one student clears others
-                    setSelected([userId])
+                    setSelected((prev) => (prev.includes(id) ? prev : [...prev, id]))
                   } else {
-                    setSelected([])
+                    setSelected((prev) => prev.filter((x) => x !== id))
                   }
                 }}
                 className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"

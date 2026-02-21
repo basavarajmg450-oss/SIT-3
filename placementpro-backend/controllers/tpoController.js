@@ -86,10 +86,14 @@ const getEligibleStudents = async (req, res) => {
 
     const appliedIds = await Application.find({ driveId: drive._id }).distinct('studentId');
 
-    const enriched = ranked.map((s) => ({
-      ...s,
-      hasApplied: appliedIds.map((id) => id.toString()).includes(s.userId?.toString()),
-    }));
+    const enriched = ranked.map((s) => {
+      const userIdStr = s.userId?._id?.toString() || s.userId?.toString();
+      return {
+        ...s,
+        userId: userIdStr,
+        hasApplied: appliedIds.map((id) => id.toString()).includes(userIdStr),
+      };
+    });
 
     res.json({ success: true, students: enriched, total: enriched.length, drive: { title: drive.title, company: drive.company } });
   } catch (error) {
@@ -101,6 +105,10 @@ const scheduleInterview = async (req, res) => {
   try {
     const { driveId, studentId, date, time, type, mode, venue, meetLink, notes, alumniId } = req.body;
 
+    if (!studentId || typeof studentId !== 'string' || studentId === '[object Object]' || !/^[a-fA-F0-9]{24}$/.test(studentId)) {
+      return res.status(400).json({ success: false, message: 'Valid student is required.' });
+    }
+
     const [drive, student] = await Promise.all([
       Drive.findById(driveId),
       User.findById(studentId),
@@ -109,10 +117,13 @@ const scheduleInterview = async (req, res) => {
     if (!drive) return res.status(404).json({ success: false, message: 'Drive not found.' });
     if (!student) return res.status(404).json({ success: false, message: 'Student not found.' });
 
+    const slotDate = date ? new Date(date) : new Date();
+    if (isNaN(slotDate.getTime())) return res.status(400).json({ success: false, message: 'Invalid date.' });
+
     const slot = new InterviewSlot({
       driveId, studentId, alumniId,
       scheduledBy: req.user._id,
-      date, time, type, mode, venue, meetLink, notes,
+      date: slotDate, time: time || '10:00', type: type || 'Technical', mode: mode || 'Online', venue, meetLink, notes,
     });
     await slot.save();
 
@@ -137,7 +148,9 @@ const scheduleInterview = async (req, res) => {
 
     res.status(201).json({ success: true, message: 'Interview scheduled and student notified!', slot });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to schedule interview.' });
+    console.error('scheduleInterview error:', error);
+    const message = error.name === 'ValidationError' ? (error.message || 'Invalid slot data.') : 'Failed to schedule interview.';
+    res.status(500).json({ success: false, message });
   }
 };
 

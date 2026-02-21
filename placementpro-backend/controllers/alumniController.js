@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AlumniProfile = require('../models/AlumniProfile');
 const Referral = require('../models/Referral');
 const InterviewSlot = require('../models/InterviewSlot');
+const AlumniReview = require('../models/AlumniReview');
 const Notification = require('../models/Notification');
 const StudentProfile = require('../models/StudentProfile');
 const User = require('../models/User');
@@ -171,13 +172,16 @@ const addMentorshipSlots = async (req, res) => {
 const getMentorshipSlots = async (req, res) => {
   try {
     const profiles = await AlumniProfile.find({ mentorshipAvailable: true })
-      .select('name company designation skills slots bio rating reviewCount')
+      .select('userId name company designation skills slots bio rating reviewCount')
       .lean();
 
-    const available = profiles.map((p) => ({
-      ...p,
-      availableSlots: p.slots.filter((s) => !s.isBooked),
-    })).filter((p) => p.availableSlots.length > 0);
+    const available = profiles
+      .map((p) => ({
+        ...p,
+        userId: p.userId ? String(p.userId) : p.userId,
+        availableSlots: (p.slots || []).filter((s) => !s.isBooked),
+      }))
+      .filter((p) => p.availableSlots.length > 0);
 
     res.json({ success: true, mentors: available, total: available.length });
   } catch (error) {
@@ -187,10 +191,9 @@ const getMentorshipSlots = async (req, res) => {
 
 const getInterviewReviews = async (req, res) => {
   try {
-    const reviews = await InterviewSlot.find({ alumniId: req.user._id, status: 'Completed' })
-      .populate('driveId', 'title company')
-      .populate('studentId', 'email')
-      .sort('-updatedAt');
+    const reviews = await AlumniReview.find({ alumniId: req.user._id })
+      .sort('-createdAt')
+      .lean();
     res.json({ success: true, reviews, total: reviews.length });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to get reviews.' });

@@ -91,11 +91,13 @@ export default function InterviewCalendar() {
 
   useEffect(() => { if (selectedDrive) loadEligible(selectedDrive) }, [selectedDrive])
 
+  const getStudentUserId = (s) => (typeof s.userId === 'string' ? s.userId : s.userId?._id?.toString?.() || s.userId?.toString?.()) || s._id?.toString?.() || ''
+
   const handleCreate = async () => {
     if (!selectedDrive || !studentToSchedule || !newDate || !newTime) return toast.error('Fill all fields')
     setCreating(true)
     try {
-      const payload = { driveId: selectedDrive, studentId: studentToSchedule, date: newDate, time: newTime, type: 'Interview', mode: 'Online' }
+      const payload = { driveId: selectedDrive, studentId: studentToSchedule, date: newDate, time: newTime, type: 'Technical', mode: 'Online' }
       const { data } = await tpoAPI.scheduleInterview(payload)
       if (data.success) {
         toast.success(data.message || 'Interview scheduled')
@@ -198,7 +200,9 @@ export default function InterviewCalendar() {
                 <label className="text-xs text-gray-600 block mb-1">Student</label>
                 <select value={studentToSchedule} onChange={(e) => setStudentToSchedule(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm">
                   <option value="">Select student</option>
-                  {eligibleStudents.map((s) => <option key={s._id} value={s.userId?._id || s._id}>{s.name} • {s.regNumber}</option>)}
+                  {eligibleStudents.map((s) => (
+                    <option key={s._id} value={getStudentUserId(s)}>{s.name} • {s.regNumber}</option>
+                  ))}
                 </select>
               </div>
               <div>

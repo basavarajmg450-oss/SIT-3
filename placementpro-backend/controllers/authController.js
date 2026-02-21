@@ -4,7 +4,8 @@ const User = require('../models/User');
 const StudentProfile = require('../models/StudentProfile');
 const AlumniProfile = require('../models/AlumniProfile');
 const { generateToken } = require('../utils/jwt');
-const { sendPasswordResetEmail } = require('../config/email');
+const { sendPasswordResetEmail, sendOTPEmail } = require('../config/email');
+const { generateOTP, getOTPExpiry } = require('../utils/otp');
 
 const register = async (req, res) => {
   try {
@@ -178,6 +179,81 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const sendOTP = async (req, res) => {
+  try {
+    const { email, role } = req.body;
+    if (!email || !role || !['student', 'tpo', 'alumni'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Email and role are required.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase(), role }).select('+otp +otpExpires');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'No account found with this email for the selected role.' });
+    }
+
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = getOTPExpiry();
+    await user.save({ validateBeforeSave: false });
+
+    await sendOTPEmail(user.email, otp);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`🔐 [DEV] OTP for ${user.email} (${role}): ${otp}`);
+    }
+
+    res.json({ success: true, message: 'OTP sent to your email.' });
+  } catch (error) {
+    console.error('sendOTP error:', error);
+    res.status(500).json({ success: false, message: 'Failed to send OTP.' });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp, role } = req.body;
+    if (!email || !otp || !role || !['student', 'tpo', 'alumni'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Email, OTP, and role are required.' });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase(), role }).select('+otp +otpExpires');
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid email or role.' });
+    }
+    if (!user.otp || user.otp !== String(otp).trim()) {
+      return res.status(401).json({ success: false, message: 'Invalid OTP.' });
+    }
+    if (!user.otpExpires || new Date() > user.otpExpires) {
+      return res.status(401).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+    }
+
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const token = generateToken({ userId: user._id, email: user.email, role: user.role });
+
+    let profile = null;
+    if (user.role === 'student') {
+      profile = await StudentProfile.findOne({ userId: user._id });
+    } else if (user.role === 'alumni') {
+      profile = await AlumniProfile.findOne({ userId: user._id });
+    }
+
+    res.json({
+      success: true,
+      message: 'Login successful!',
+      token,
+      user: { id: user._id, email: user.email, role: user.role, name: user.name, lastLogin: user.lastLogin },
+      profile,
+      isNewUser: !profile,
+    });
+  } catch (error) {
+    console.error('verifyOTP error:', error);
+    res.status(500).json({ success: false, message: 'OTP verification failed.' });
+  }
+};
+
 const logout = async (req, res) => {
   res.json({ success: true, message: 'Logged out successfully.' });
 };
@@ -203,4 +279,4 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, getMe, forgotPassword, resetPassword };
+module.exports = { register, login, logout, getMe, forgotPassword, resetPassword, sendOTP, verifyOTP };

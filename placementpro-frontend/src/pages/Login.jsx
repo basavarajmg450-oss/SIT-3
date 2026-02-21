@@ -41,7 +41,7 @@ export default function Login() {
   }, [countdown])
 
   const handleSendOTP = async (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     if (!email) return toast.error('Please enter your email')
     setLoading(true)
     try {
@@ -289,6 +289,12 @@ export default function Login() {
                     💡 <strong>Dev Mode:</strong> OTP is logged to server console. Check terminal.
                   </p>
                 </div>
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  Prefer password?{' '}
+                  <button type="button" onClick={() => navigate('/')} className="text-indigo-600 hover:text-indigo-700 font-medium">
+                    Sign in with password on home
+                  </button>
+                </p>
               </motion.div>
             )}
 

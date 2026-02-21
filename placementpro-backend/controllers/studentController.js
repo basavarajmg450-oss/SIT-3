@@ -2,6 +2,7 @@ const StudentProfile = require('../models/StudentProfile');
 const Drive = require('../models/Drive');
 const Application = require('../models/Application');
 const AlumniProfile = require('../models/AlumniProfile');
+const AlumniReview = require('../models/AlumniReview');
 const Notification = require('../models/Notification');
 const { checkStudentEligibility, calculateSkillGap } = require('../utils/criteriaEngine');
 const { generateResumePDF } = require('../utils/pdfGenerator');
@@ -305,4 +306,69 @@ const bookMentorship = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, generateResume, getEligibleDrives, applyToDrive, getApplications, getSkillGap, bookMentorship };
+const submitAlumniReview = async (req, res) => {
+  try {
+    const { alumniId, alumniProfileId, rating, comment } = req.body;
+    if (rating == null || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating (1–5) is required.' });
+    }
+
+    let alumniProfile = null;
+    let resolvedAlumniId = null;
+    if (alumniId && typeof alumniId === 'string' && /^[a-fA-F0-9]{24}$/.test(alumniId)) {
+      alumniProfile = await AlumniProfile.findOne({ userId: alumniId });
+      resolvedAlumniId = alumniId;
+    }
+    if (!alumniProfile && alumniProfileId) {
+      alumniProfile = await AlumniProfile.findById(alumniProfileId).select('userId');
+      if (alumniProfile) resolvedAlumniId = alumniProfile.userId?.toString?.();
+    }
+    if (!alumniProfile || !resolvedAlumniId) {
+      return res.status(404).json({ success: false, message: 'Alumni not found.' });
+    }
+
+    const studentProfile = await StudentProfile.findOne({ userId: req.user._id });
+    const studentName = studentProfile?.name || req.user.email?.split('@')[0] || 'Student';
+
+    const existing = await AlumniReview.findOne({ alumniId: resolvedAlumniId, studentId: req.user._id });
+    if (existing) {
+      existing.rating = rating;
+      existing.comment = comment || '';
+      existing.studentName = studentName;
+      await existing.save();
+    } else {
+      await AlumniReview.create({
+        alumniId: resolvedAlumniId,
+        studentId: req.user._id,
+        studentName,
+        rating: parseInt(rating),
+        comment: (comment || '').trim(),
+      });
+    }
+
+    const reviews = await AlumniReview.find({ alumniId: resolvedAlumniId });
+    const total = reviews.length;
+    const avgRating = total ? reviews.reduce((s, r) => s + r.rating, 0) / total : 0;
+    alumniProfile = await AlumniProfile.findOne({ userId: resolvedAlumniId });
+    if (alumniProfile) {
+      alumniProfile.rating = Math.round(avgRating * 10) / 10;
+      alumniProfile.reviewCount = total;
+      await alumniProfile.save();
+    }
+
+    await Notification.create({
+      userId: resolvedAlumniId,
+      type: 'system',
+      title: 'New review from student',
+      message: `${studentName} left you a ${rating}-star review.`,
+      actionLink: '/alumni/reviews',
+    });
+
+    res.status(201).json({ success: true, message: 'Thank you! Your review has been submitted.' });
+  } catch (error) {
+    console.error('submitAlumniReview error:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit review.' });
+  }
+};
+
+module.exports = { getProfile, updateProfile, generateResume, getEligibleDrives, applyToDrive, getApplications, getSkillGap, bookMentorship, submitAlumniReview };
