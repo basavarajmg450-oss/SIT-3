@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: placementpro-backend
+    env: node
+    plan: free
+    buildCommand: cd placementpro-backend && npm install
+    startCommand: cd placementpro-backend && npm start
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 10000
+        scope: run_and_build
+      - key: NODE_ENV
+        value: production
+        scope: run_and_build
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+        scope: run_and_build
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+        scope: run_and_build
+      - key: EMAIL_PORT
+        value: 587
+        scope: run_and_build
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        value: PlacementPro <noreply@placementpro.com>
+        scope: run_and_build
+      - key: FRONTEND_URL
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+        scope: run_and_build
+      - key: RATE_LIMIT_MAX
+        value: 5000
+        scope: run_and_build
+      - key: OTP_EXPIRY_MINUTES
+        value: 10
+        scope: run_and_build
+      - key: VITE_API_URL
+        sync: false
