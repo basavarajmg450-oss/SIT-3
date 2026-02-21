@@ -1,13 +1,18 @@
 import { motion } from 'framer-motion'
 import { cardHover } from '../../utils/animations'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function Card({ children, className = '', hover = false, onClick, gradient }) {
+  const { isDark } = useTheme()
   const Component = hover || onClick ? motion.div : 'div'
   const motionProps = hover || onClick ? { ...cardHover, onClick } : { onClick }
 
   return (
     <Component
-      className={`bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 ${hover || onClick ? 'cursor-pointer' : ''} ${gradient ? 'overflow-hidden' : ''} ${className}`}
+      className={`backdrop-blur-xl rounded-2xl shadow-lg border transition-all duration-300 ${isDark
+          ? 'bg-slate-900/70 border-white/10'
+          : 'bg-white/90 border-slate-200'
+        } ${hover || onClick ? 'cursor-pointer' : ''} ${gradient ? 'overflow-hidden' : ''} ${className}`}
       {...motionProps}
     >
       {gradient && (
@@ -19,6 +24,7 @@ export default function Card({ children, className = '', hover = false, onClick,
 }
 
 export function StatCard({ icon, label, value, change, color = 'indigo', gradient: gradientColors }) {
+  const { isDark } = useTheme()
   const colorMap = {
     indigo: 'from-indigo-500 to-indigo-600',
     purple: 'from-purple-500 to-purple-600',
@@ -30,13 +36,16 @@ export function StatCard({ icon, label, value, change, color = 'indigo', gradien
 
   return (
     <motion.div
-      className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/10"
+      className={`backdrop-blur-xl rounded-2xl p-6 shadow-lg border transition-all duration-300 ${isDark
+          ? 'bg-slate-900/70 border-white/10'
+          : 'bg-white/90 border-slate-200'
+        }`}
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
     >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-slate-400 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-white">{value}</p>
+          <p className={`text-3xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>{value}</p>
           {change !== undefined && (
             <p className={`text-xs font-medium mt-1 ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
               {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% from last month

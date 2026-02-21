@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function LoadingSpinner({ size = 'md', text = '', fullScreen = false }) {
+  const { isDark } = useTheme()
   const sizes = { sm: 'w-5 h-5', md: 'w-10 h-10', lg: 'w-16 h-16' }
 
   const spinner = (
@@ -10,17 +12,18 @@ export default function LoadingSpinner({ size = 'md', text = '', fullScreen = fa
         animate={{ rotate: 360 }}
         transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
       />
-      {text && <p className="text-sm text-slate-400 font-medium">{text}</p>}
+      {text && <p className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{text}</p>}
     </div>
   )
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className={`fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300 ${isDark ? 'bg-slate-900/80' : 'bg-white/80'
+        }`}>
         <div className="text-center">
           <div className="text-4xl mb-4">🎓</div>
           {spinner}
-          {!text && <p className="text-sm text-slate-400 mt-2 font-medium">Loading PlacementPro...</p>}
+          {!text && <p className={`text-sm mt-2 font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Loading PlacementPro...</p>}
         </div>
       </div>
     )

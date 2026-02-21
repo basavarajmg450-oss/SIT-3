@@ -6,6 +6,7 @@ import { tpoAPI } from '../services/api'
 import Navbar from '../components/common/Navbar'
 import Sidebar from '../components/common/Sidebar'
 import { StatCard } from '../components/common/Card'
+import { useTheme } from '../context/ThemeContext'
 import CreateDrive from '../components/tpo/CreateDrive'
 import AnalyticsDashboard from '../components/tpo/AnalyticsDashboard'
 import EligibleStudents from '../components/tpo/EligibleStudents'
@@ -24,6 +25,7 @@ const quickActions = [
 
 function Home() {
   const navigate = useNavigate()
+  const { isDark } = useTheme()
   const [stats, setStats] = useState({ totalDrives: 0, activeDrives: 0, totalApplications: 0, placedStudents: 0 })
   const [recentDrives, setRecentDrives] = useState([])
   const [exporting, setExporting] = useState(false)
@@ -40,7 +42,7 @@ function Home() {
       ])
       if (analyticsRes.data.success) setStats(analyticsRes.data.stats)
       if (drivesRes.data.success) setRecentDrives(drivesRes.data.drives)
-    } catch {}
+    } catch { }
   }
 
   const handleExport = async () => {
@@ -83,7 +85,7 @@ function Home() {
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold text-white"
+            className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}
           >
             TPO Dashboard 👨‍💼
           </motion.h1>
@@ -91,7 +93,7 @@ function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-slate-400 text-sm mt-0.5"
+            className={`${isDark ? 'text-slate-400' : 'text-slate-500'} text-sm mt-0.5`}
           >
             Manage drives, students, and placements
           </motion.p>
@@ -132,9 +134,10 @@ function Home() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-sm hover:shadow-md transition-shadow">
+          <div className={`backdrop-blur-xl rounded-2xl p-5 border shadow-sm transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10 hover:shadow-cyan-500/5' : 'bg-white border-slate-200 hover:shadow-md'
+            }`}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-white">Recent Drives</h2>
+              <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>Recent Drives</h2>
               <motion.button
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.4 }}
@@ -151,14 +154,15 @@ function Home() {
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.35 + i * 0.05 }}
-                  whileHover={{ x: 4, backgroundColor: '#f9fafb' }}
+                  whileHover={{ x: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.02)' }}
                   onClick={() => navigate(`/tpo/drives`)}
-                  className="flex items-center justify-between p-3 bg-white/10 rounded-xl cursor-pointer border border-transparent hover:border-white/20 transition-all"
+                  className={`flex items-center justify-between p-3 rounded-xl cursor-pointer border transition-all ${isDark ? 'bg-white/10 border-transparent hover:border-white/20' : 'bg-slate-50 border-slate-100 hover:border-slate-200'
+                    }`}
                 >
                   <div>
-                    <p className="font-medium text-white text-sm">{drive.company}</p>
-                    <p className="text-xs text-slate-400">{drive.title}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Deadline: {formatDate(drive.deadline)}</p>
+                    <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{drive.company}</p>
+                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{drive.title}</p>
+                    <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Deadline: {formatDate(drive.deadline)}</p>
                   </div>
                   <div className="text-right">
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(drive.status)}`}>{drive.status}</span>
@@ -186,10 +190,11 @@ function Home() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
         >
-          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-sm overflow-hidden">
+          <div className={`backdrop-blur-xl rounded-2xl p-5 border shadow-sm transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200'
+            }`}>
             <div className="flex items-center gap-2 mb-4">
               <Zap className="w-5 h-5 text-amber-500" />
-              <h2 className="font-semibold text-white">Quick Actions</h2>
+              <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>Quick Actions</h2>
             </div>
             <div className="space-y-2">
               {quickActions.map((action, i) => {
@@ -204,7 +209,8 @@ function Home() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleQuickAction(action)}
                     disabled={action.type === 'export' && exporting}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all text-left group border border-transparent hover:border-white/20"
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group border border-transparent ${isDark ? 'hover:bg-white/10 hover:border-white/10' : 'hover:bg-slate-50 hover:border-slate-100'
+                      }`}
                   >
                     <motion.div
                       className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center text-white shadow-md`}
@@ -212,7 +218,8 @@ function Home() {
                     >
                       <Icon className="w-5 h-5" />
                     </motion.div>
-                    <span className="text-sm font-medium text-slate-200 group-hover:text-cyan-400 transition-colors flex-1">
+                    <span className={`text-sm font-medium transition-colors flex-1 ${isDark ? 'text-slate-200 group-hover:text-cyan-400' : 'text-slate-700 group-hover:text-indigo-600'
+                      }`}>
                       {action.label}
                     </span>
                     {action.type === 'export' && exporting ? (
@@ -244,6 +251,7 @@ function Home() {
 function ManageDrives() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isDark } = useTheme()
   const openCreate = new URLSearchParams(location.search).get('create') === '1'
   const [drives, setDrives] = useState([])
   const [loading, setLoading] = useState(true)
@@ -259,7 +267,7 @@ function ManageDrives() {
     try {
       const { data } = await tpoAPI.getDrives({ limit: 50 })
       if (data.success) setDrives(data.drives)
-    } catch {} finally { setLoading(false) }
+    } catch { } finally { setLoading(false) }
   }
 
   const handleStatusUpdate = async (driveId, status) => {
@@ -273,32 +281,35 @@ function ManageDrives() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Manage Drives 💼</h1>
+        <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Manage Drives 💼</h1>
         <button onClick={() => setShowCreate(!showCreate)} className="btn-primary text-sm flex items-center gap-2">
           <Plus className="w-4 h-4" /> {showCreate ? 'Cancel' : 'Create Drive'}
         </button>
       </div>
 
       {showCreate && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'
+          }`}>
           <CreateDrive onSuccess={() => { setShowCreate(false); loadDrives() }} />
         </motion.div>
       )}
 
       {loading ? (
-        <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-24 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 animate-pulse" />)}</div>
+        <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className={`h-24 backdrop-blur-xl rounded-2xl border animate-pulse ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200'
+          }`} />)}</div>
       ) : (
         <div className="space-y-3">
           {drives.map((drive, i) => (
-            <motion.div key={drive._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
-              <div className="p-4 cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setSelected(selected === drive._id ? null : drive._id)}>
+            <motion.div key={drive._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className={`backdrop-blur-xl rounded-2xl border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'
+              } overflow-hidden`}>
+              <div className={`p-4 cursor-pointer transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-50'}`} onClick={() => setSelected(selected === drive._id ? null : drive._id)}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 font-bold">{drive.company[0]}</div>
                     <div>
-                      <h3 className="font-semibold text-white text-sm">{drive.title}</h3>
+                      <h3 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{drive.title}</h3>
                       <p className="text-indigo-600 text-sm font-medium">{drive.company}</p>
-                      <div className="flex gap-3 text-xs text-slate-400 mt-0.5">
+                      <div className={`flex gap-3 text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                         <span>CGPA ≥ {drive.minCGPA}</span>
                         <span>{drive.applicationCount} applied</span>
                         <span>Deadline: {formatDate(drive.deadline)}</span>
@@ -312,12 +323,12 @@ function ManageDrives() {
                 </div>
               </div>
               {selected === drive._id && (
-                <div className="px-4 pb-4 border-t border-white/10 pt-3 space-y-3">
+                <div className={`px-4 pb-4 border-t pt-3 space-y-3 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Salary</p><p className="font-semibold text-slate-100">{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p></div>
-                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Branches</p><p className="font-semibold text-slate-100">{drive.eligibleBranches.join(', ')}</p></div>
-                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Max Backlogs</p><p className="font-semibold text-slate-100">{drive.maxBacklogs}</p></div>
-                    <div className="bg-white/10 rounded-lg p-2"><p className="text-slate-400">Selected</p><p className="font-semibold text-slate-100">{drive.selectedCount || 0}</p></div>
+                    <div className={`rounded-lg p-2 ${isDark ? 'bg-white/10' : 'bg-slate-50'}`}><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Salary</p><p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p></div>
+                    <div className={`rounded-lg p-2 ${isDark ? 'bg-white/10' : 'bg-slate-50'}`}><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Branches</p><p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{drive.eligibleBranches.join(', ')}</p></div>
+                    <div className={`rounded-lg p-2 ${isDark ? 'bg-white/10' : 'bg-slate-50'}`}><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Max Backlogs</p><p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{drive.maxBacklogs}</p></div>
+                    <div className={`rounded-lg p-2 ${isDark ? 'bg-white/10' : 'bg-slate-50'}`}><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Selected</p><p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{drive.selectedCount || 0}</p></div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => navigate(`/tpo/students?driveId=${drive._id}`)} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors font-medium">View Eligible Students</button>
@@ -336,21 +347,22 @@ function ManageDrives() {
 }
 
 function AuditLogs() {
+  const { isDark } = useTheme()
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    tpoAPI.getAuditLogs({ limit: 50 }).then(({ data }) => { if (data.success) setLogs(data.logs) }).catch(() => {}).finally(() => setLoading(false))
+    tpoAPI.getAuditLogs({ limit: 50 }).then(({ data }) => { if (data.success) setLogs(data.logs) }).catch(() => { }).finally(() => setLoading(false))
   }, [])
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-white">Audit Logs 📜</h1>
-      {loading ? <div className="text-center py-10"><motion.div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-500 rounded-full mx-auto" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
-        <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Audit Logs 📜</h1>
+      {loading ? <div className="text-center py-10"><motion.div className={`w-8 h-8 border-2 border-t-indigo-500 rounded-full mx-auto ${isDark ? 'border-indigo-200' : 'border-slate-200'}`} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
+        <div className={`backdrop-blur-xl rounded-2xl border overflow-hidden shadow-sm transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200'}`}>
           <table className="w-full text-sm">
-            <thead className="bg-white/10 border-b border-white/10">
-              <tr>{['Action', 'User', 'Method', 'Path', 'Time'].map((h) => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-300">{h}</th>)}</tr>
+            <thead className={`border-b transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-slate-50 border-slate-100'}`}>
+              <tr>{['Action', 'User', 'Method', 'Path', 'Time'].map((h) => <th key={h} className={`text-left px-4 py-3 text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {logs.length === 0 ? (
@@ -373,19 +385,25 @@ function AuditLogs() {
 }
 
 function StudentsPage() {
+  const { isDark } = useTheme()
   const [driveId, setDriveId] = useState(new URLSearchParams(window.location.search).get('driveId') || '')
   const [drives, setDrives] = useState([])
 
   useEffect(() => {
-    tpoAPI.getDrives({ limit: 50 }).then(({ data }) => { if (data.success) setDrives(data.drives) }).catch(() => {})
+    tpoAPI.getDrives({ limit: 50 }).then(({ data }) => { if (data.success) setDrives(data.drives) }).catch(() => { })
   }, [])
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-white">Students 🎓</h1>
+      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Students 🎓</h1>
       <div>
-        <label className="text-sm font-medium text-slate-200 mb-1.5 block">Select Drive</label>
-        <select value={driveId} onChange={(e) => setDriveId(e.target.value)} className="w-full max-w-xs px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all">
+        <label className={`text-sm font-medium mb-1.5 block ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Select Drive</label>
+        <select
+          value={driveId}
+          onChange={(e) => setDriveId(e.target.value)}
+          className={`w-full max-w-xs px-3 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all border ${isDark ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-900'
+            }`}
+        >
           <option value="">Select a drive...</option>
           {drives.map((d) => <option key={d._id} value={d._id}>{d.company} - {d.title}</option>)}
         </select>
@@ -397,6 +415,7 @@ function StudentsPage() {
 
 export default function TPODashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { isDark } = useTheme()
 
   return (
     <div className="min-h-screen">
@@ -408,10 +427,10 @@ export default function TPODashboard() {
             <Route path="/" element={<Home />} />
             <Route path="/drives" element={<ManageDrives />} />
             <Route path="/students" element={<StudentsPage />} />
-            <Route path="/analytics" element={<div><h1 className="text-2xl font-bold text-white mb-5">Analytics 📊</h1><AnalyticsDashboard /></div>} />
+            <Route path="/analytics" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Analytics 📊</h1><AnalyticsDashboard /></div>} />
             <Route path="/audit-logs" element={<AuditLogs />} />
-            <Route path="/applications" element={<div><h1 className="text-2xl font-bold text-white mb-5">Applications</h1><p className="text-slate-400">Select a drive from Manage Drives to view applications.</p></div>} />
-            <Route path="/interviews" element={<div><h1 className="text-2xl font-bold text-white mb-5">Interviews 🎤</h1><InterviewCalendar /></div>} />
+            <Route path="/applications" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Applications</h1><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>Select a drive from Manage Drives to view applications.</p></div>} />
+            <Route path="/interviews" element={<div><h1 className={`text-2xl font-bold mb-5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Interviews 🎤</h1><InterviewCalendar /></div>} />
           </Routes>
         </div>
       </main>

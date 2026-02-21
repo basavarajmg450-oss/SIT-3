@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+// Theme context for the application
 
 const ThemeContext = createContext(null)
 

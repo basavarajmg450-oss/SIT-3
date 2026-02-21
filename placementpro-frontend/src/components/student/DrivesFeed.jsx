@@ -4,8 +4,10 @@ import { studentAPI } from '../../services/api'
 import { formatDate, formatSalaryRange, daysUntil, getBranchColor } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 import { Search, MapPin, Calendar, TrendingUp, CheckCircle, Clock, Filter } from 'lucide-react'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function DrivesFeed({ compact = false }) {
+  const { isDark } = useTheme()
   const [drives, setDrives] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -53,12 +55,12 @@ export default function DrivesFeed({ compact = false }) {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 animate-pulse">
+          <div key={i} className={`rounded-2xl p-5 border animate-pulse ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-100'}`}>
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 bg-gray-200 rounded-xl" />
+              <div className={`w-12 h-12 rounded-xl ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className={`h-4 rounded w-3/4 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
+                <div className={`h-3 rounded w-1/2 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               </div>
             </div>
           </div>
@@ -78,7 +80,8 @@ export default function DrivesFeed({ compact = false }) {
               placeholder="Search companies, roles..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input-field pl-9 py-2.5 text-sm"
+              className={`w-full pl-9 py-2.5 rounded-xl text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500/40 border ${isDark ? 'bg-slate-800/80 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                }`}
             />
           </div>
         </div>
@@ -99,10 +102,13 @@ export default function DrivesFeed({ compact = false }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className={`bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-all ${drive.hasApplied ? 'border-emerald-200 bg-emerald-50/30' : ''}`}
+                className={`backdrop-blur-xl rounded-2xl border overflow-hidden transition-all duration-300 ${drive.hasApplied
+                  ? isDark ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-emerald-200 bg-emerald-50/50'
+                  : isDark ? 'bg-slate-900/70 border-white/10 hover:border-white/20' : 'bg-white border-slate-200 hover:shadow-md'
+                  }`}
               >
                 <div
-                  className="p-4 cursor-pointer"
+                  className={`p-4 cursor-pointer transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}
                   onClick={() => setSelected(selected?._id === drive._id ? null : drive)}
                 >
                   <div className="flex items-start gap-3">
@@ -112,7 +118,7 @@ export default function DrivesFeed({ compact = false }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4 className="font-semibold text-gray-900 text-sm leading-tight">{drive.title}</h4>
+                          <h4 className={`font-semibold text-sm leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{drive.title}</h4>
                           <p className="text-indigo-600 font-medium text-sm">{drive.company}</p>
                         </div>
                         {drive.hasApplied ? (
@@ -130,11 +136,11 @@ export default function DrivesFeed({ compact = false }) {
                           <span key={b} className={`text-xs px-2 py-0.5 rounded-full font-medium ${getBranchColor(b)}`}>{b}</span>
                         ))}
                         {drive.eligibleBranches.length > 3 && (
-                          <span className="text-xs text-gray-500">+{drive.eligibleBranches.length - 3} more</span>
+                          <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>+{drive.eligibleBranches.length - 3} more</span>
                         )}
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getWorkModeColor(drive.workMode)}`}>{drive.workMode}</span>
                       </div>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                      <div className={`flex items-center gap-3 mt-2 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                         <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" />{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</span>
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{drive.location || 'TBD'}</span>
                         <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(drive.driveDate)}</span>
@@ -151,24 +157,24 @@ export default function DrivesFeed({ compact = false }) {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                        <p className="text-sm text-gray-600 mb-3">{drive.description}</p>
+                      <div className={`px-4 pb-4 border-t pt-3 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                        <p className={`text-sm mb-3 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{drive.description}</p>
                         <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                          <div className="bg-gray-50 rounded-xl p-3">
-                            <p className="text-xs text-gray-500 mb-1">Min CGPA Required</p>
+                          <div className={`rounded-xl p-3 ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                            <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Min CGPA Required</p>
                             <p className="font-bold text-indigo-600">{drive.minCGPA}</p>
                           </div>
-                          <div className="bg-gray-50 rounded-xl p-3">
-                            <p className="text-xs text-gray-500 mb-1">Max Backlogs</p>
+                          <div className={`rounded-xl p-3 ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                            <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Max Backlogs</p>
                             <p className="font-bold text-indigo-600">{drive.maxBacklogs}</p>
                           </div>
                         </div>
                         {drive.requirements?.length > 0 && (
                           <div className="mb-3">
-                            <p className="text-xs font-semibold text-gray-700 mb-1.5">Requirements</p>
+                            <p className={`text-xs font-semibold mb-1.5 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Requirements</p>
                             <div className="flex flex-wrap gap-1.5">
                               {drive.requirements.map((r) => (
-                                <span key={r} className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full">{r}</span>
+                                <span key={r} className={`text-xs px-2.5 py-1 rounded-full ${isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-50 text-indigo-700'}`}>{r}</span>
                               ))}
                             </div>
                           </div>

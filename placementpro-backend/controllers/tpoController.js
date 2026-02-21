@@ -49,7 +49,11 @@ const createDrive = async (req, res) => {
     res.status(201).json({ success: true, message: `Drive created and ${eligibleStudents.length} students notified!`, drive });
   } catch (error) {
     console.error('createDrive error:', error);
-    res.status(500).json({ success: false, message: 'Failed to create drive.' });
+    let message = 'Failed to create drive.';
+    if (error.name === 'ValidationError') {
+      message = Object.values(error.errors).map(val => val.message).join(', ');
+    }
+    res.status(400).json({ success: false, message });
   }
 };
 

@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { tpoAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { Search, ChevronDown, Mail, GraduationCap, Calendar, Clock } from 'lucide-react'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function EligibleStudents({ driveId, driveName }) {
+  const { isDark } = useTheme()
   const [students, setStudents] = useState([])
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
@@ -113,12 +115,12 @@ export default function EligibleStudents({ driveId, driveName }) {
     return (
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 animate-pulse">
+          <div key={i} className={`rounded-2xl p-4 border animate-pulse ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-100'}`}>
             <div className="flex gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
+              <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/3" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className={`h-4 rounded w-1/3 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
+                <div className={`h-3 rounded w-1/2 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               </div>
             </div>
           </div>
@@ -137,7 +139,8 @@ export default function EligibleStudents({ driveId, driveName }) {
             placeholder="Search students..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+            className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-sm transition-all border outline-none focus:ring-2 focus:ring-indigo-500/40 ${isDark ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-900'
+              }`}
           />
         </div>
         {selected.length > 0 && (
@@ -154,7 +157,7 @@ export default function EligibleStudents({ driveId, driveName }) {
         )}
       </div>
 
-      <div className="text-sm text-gray-500 mb-3 flex items-center gap-1">
+      <div className={`text-sm mb-3 flex items-center gap-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
         <GraduationCap className="w-4 h-4" />
         {filtered.length} eligible students
       </div>
@@ -166,7 +169,7 @@ export default function EligibleStudents({ driveId, driveName }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
-            className="bg-white rounded-xl border border-gray-100 p-3 hover:shadow-sm transition-shadow"
+            className={`backdrop-blur-xl rounded-xl border p-3 transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-100'}`}
           >
             <div className="flex items-center gap-3">
               <input
@@ -188,15 +191,15 @@ export default function EligibleStudents({ driveId, driveName }) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-medium text-gray-900 text-sm">{student.name}</p>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{student.regNumber}</span>
-                  <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">{student.branch}</span>
+                  <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{student.name}</p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>{student.regNumber}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-indigo-500/20 text-indigo-300' : 'bg-indigo-50 text-indigo-600'}`}>{student.branch}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getCGPAColor(student.cgpa)}`}>
                     CGPA: {student.cgpa}
                   </span>
-                  <span className="text-xs text-gray-500">Backlogs: {student.backlogs || 0}</span>
+                  <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Backlogs: {student.backlogs || 0}</span>
                   {student.hasApplied && (
                     <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Applied ✓</span>
                   )}
@@ -225,18 +228,18 @@ export default function EligibleStudents({ driveId, driveName }) {
         )}
       </div>
       {scheduleOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg">
-            <h3 className="font-semibold text-gray-800 mb-3">Schedule Interview</h3>
-            <p className="text-sm text-gray-500 mb-4">Student: <span className="font-medium">{scheduleStudent?.name || scheduleStudent?.regNumber}</span></p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl ${isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
+            <h3 className={`font-semibold mb-3 ${isDark ? 'text-white' : 'text-slate-800'}`}>Schedule Interview</h3>
+            <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Student: <span className="font-medium">{scheduleStudent?.name || scheduleStudent?.regNumber}</span></p>
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div>
-                <label className="text-xs text-gray-600 block mb-1">Date</label>
-                <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+                <label className={`text-xs block mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Date</label>
+                <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} className={`w-full px-3 py-2.5 rounded-xl text-sm border ${isDark ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-gray-200'}`} />
               </div>
               <div>
-                <label className="text-xs text-gray-600 block mb-1">Time</label>
-                <input type="time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm" />
+                <label className={`text-xs block mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Time</label>
+                <input type="time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className={`w-full px-3 py-2.5 rounded-xl text-sm border ${isDark ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-gray-200'}`} />
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">

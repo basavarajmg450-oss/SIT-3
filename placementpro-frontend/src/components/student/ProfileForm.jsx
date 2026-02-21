@@ -45,9 +45,9 @@ export default function ProfileForm({ onSave }) {
     try {
       const payload = {
         ...form,
-        cgpa: parseFloat(form.cgpa),
-        backlogs: parseInt(form.backlogs),
-        semester: parseInt(form.semester),
+        cgpa: form.cgpa ? parseFloat(form.cgpa) : 0,
+        backlogs: form.backlogs ? parseInt(form.backlogs) : 0,
+        semester: form.semester ? parseInt(form.semester) : undefined,
         skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
         achievements: form.achievements.split('\n').map((a) => a.trim()).filter(Boolean),
       }
@@ -199,7 +199,7 @@ export default function ProfileForm({ onSave }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-1 block">Title *</label>
-                <input value={project.title} onChange={(e) => updateProject(idx, 'title', e.target.value)} placeholder="Project Title" className={inputClass} />
+                <input value={project.title} onChange={(e) => updateProject(idx, 'title', e.target.value)} placeholder="Project Title" className={inputClass} required />
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-500 mb-1 block">Duration</label>

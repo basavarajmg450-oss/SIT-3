@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 
 const studentLinks = [
   { to: '/student', label: 'Dashboard', icon: '🏠', end: true },
@@ -33,29 +34,30 @@ const alumniLinks = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user, profile } = useAuth()
+  const { isDark } = useTheme()
   const location = useLocation()
 
   const links = user?.role === 'student' ? studentLinks : user?.role === 'tpo' ? tpoLinks : alumniLinks
 
   const sidebarContent = (
-    <div className="flex flex-col h-full">
-      <div className="p-5 border-b border-white/10">
+    <div className={`flex flex-col h-full transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+      <div className={`p-5 border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
             {profile?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
           </div>
           <div>
-            <p className="font-semibold text-white text-sm">{profile?.name || user?.email?.split('@')[0]}</p>
-            <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+            <p className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{profile?.name || user?.email?.split('@')[0]}</p>
+            <p className={`text-xs capitalize ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{user?.role}</p>
           </div>
         </div>
         {user?.role === 'student' && profile?.profileCompleteness !== undefined && (
           <div className="mt-3">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-slate-400">Profile</span>
-              <span className="text-xs font-semibold text-cyan-400">{profile.profileCompleteness}%</span>
+              <span className={`text-xs font-semibold ${isDark ? 'text-cyan-400' : 'text-indigo-600'}`}>{profile.profileCompleteness}%</span>
             </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-slate-100'}`}>
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${profile.profileCompleteness}%` }}
@@ -76,10 +78,9 @@ export default function Sidebar({ isOpen, onClose }) {
                 end={link.end}
                 onClick={() => window.innerWidth < 1024 && onClose?.()}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-white/15 text-white shadow-sm'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
+                    ? isDark ? 'bg-white/15 text-white shadow-sm' : 'bg-indigo-50 text-indigo-700 shadow-sm'
+                    : isDark ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`
                 }
               >
@@ -101,10 +102,10 @@ export default function Sidebar({ isOpen, onClose }) {
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-white/10">
-        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
-          <p className="text-xs font-semibold text-white mb-0.5">PlacementPro v1.0</p>
-          <p className="text-xs text-slate-400">Your Career Launchpad</p>
+      <div className={`p-4 border-t ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+        <div className={`rounded-xl p-3 border ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+          <p className={`text-xs font-semibold mb-0.5 ${isDark ? 'text-white' : 'text-slate-800'}`}>PlacementPro v1.0</p>
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Your Career Launchpad</p>
         </div>
       </div>
     </div>
@@ -128,12 +129,14 @@ export default function Sidebar({ isOpen, onClose }) {
         initial={false}
         animate={{ x: isOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed left-0 top-16 bottom-0 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-white/10 shadow-xl z-30 lg:hidden"
+        className={`fixed left-0 top-16 bottom-0 w-64 backdrop-blur-xl border-r shadow-xl z-30 lg:hidden transition-all duration-300 ${isDark ? 'bg-slate-900/95 border-white/10 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
+          }`}
       >
         {sidebarContent}
       </motion.aside>
 
-      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-slate-900/80 backdrop-blur-xl border-r border-white/10 z-20">
+      <aside className={`hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 backdrop-blur-xl border-r z-20 transition-all duration-300 ${isDark ? 'bg-slate-900/80 border-white/10' : 'bg-white/90 border-slate-200'
+        }`}>
         {sidebarContent}
       </aside>
     </>

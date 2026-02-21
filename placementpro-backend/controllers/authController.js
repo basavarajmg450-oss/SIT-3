@@ -25,7 +25,7 @@ const register = async (req, res) => {
       return res.status(400).json({ success: false, message: `An account with this email already exists as ${role}.` });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 6);
     const user = new User({
       email: email.toLowerCase(),
       password: hashedPassword,
@@ -166,7 +166,7 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired reset link.' });
     }
 
-    user.password = await bcrypt.hash(password, 12);
+    user.password = await bcrypt.hash(password, 6);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();

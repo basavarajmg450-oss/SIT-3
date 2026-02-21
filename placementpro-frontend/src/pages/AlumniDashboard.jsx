@@ -6,6 +6,7 @@ import { alumniAPI } from '../services/api'
 import Navbar from '../components/common/Navbar'
 import Sidebar from '../components/common/Sidebar'
 import { StatCard } from '../components/common/Card'
+import { useTheme } from '../context/ThemeContext'
 import PostReferral from '../components/alumni/PostReferral'
 import toast from 'react-hot-toast'
 import { formatDate, getStatusColor } from '../utils/helpers'
@@ -13,6 +14,7 @@ import { Plus, Save } from 'lucide-react'
 
 function Home() {
   const { user, profile } = useAuth()
+  const { isDark } = useTheme()
   const navigate = useNavigate()
   const [referrals, setReferrals] = useState([])
   const [loading, setLoading] = useState(true)
@@ -23,7 +25,7 @@ function Home() {
     try {
       const { data } = await alumniAPI.getReferrals()
       if (data.success) setReferrals(data.referrals)
-    } catch {} finally { setLoading(false) }
+    } catch { } finally { setLoading(false) }
   }
 
   const stats = [
@@ -36,8 +38,8 @@ function Home() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Welcome, {profile?.name?.split(' ')[0] || 'Alumni'}! 🌟</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Help students launch their careers</p>
+        <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Welcome, {profile?.name?.split(' ')[0] || 'Alumni'}! 🌟</h1>
+        <p className={`${isDark ? 'text-slate-400' : 'text-slate-500'} text-sm mt-0.5`}>Help students launch their careers</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -50,20 +52,20 @@ function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-5">
-          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+          <div className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-white">My Referrals</h2>
+              <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>My Referrals</h2>
               <button onClick={() => navigate('/alumni/referrals')} className="text-xs text-cyan-400 font-medium">View all →</button>
             </div>
             {referrals.length === 0 ? (
-              <div className="text-center py-6"><div className="text-3xl mb-2">🔗</div><p className="text-slate-400 text-sm">No referrals yet. Post your first referral!</p></div>
+              <div className="text-center py-6"><div className="text-3xl mb-2">🔗</div><p className={`${isDark ? 'text-slate-400' : 'text-slate-500'} text-sm`}>No referrals yet. Post your first referral!</p></div>
             ) : (
               <div className="space-y-2">
                 {referrals.slice(0, 3).map((ref) => (
-                  <div key={ref._id} className="flex items-center justify-between p-3 bg-white/10 rounded-xl">
+                  <div key={ref._id} className={`flex items-center justify-between p-3 rounded-xl ${isDark ? 'bg-white/10' : 'bg-slate-50'}`}>
                     <div>
-                      <p className="font-medium text-white text-sm">{ref.role} at {ref.company}</p>
-                      <p className="text-xs text-slate-400">{ref.applicants?.length || 0}/{ref.maxReferrals} applied</p>
+                      <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{ref.role} at {ref.company}</p>
+                      <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{ref.applicants?.length || 0}/{ref.maxReferrals} applied</p>
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(ref.status)}`}>{ref.status}</span>
                   </div>
@@ -72,8 +74,8 @@ function Home() {
             )}
           </div>
 
-          <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
-            <h2 className="font-semibold text-white mb-4">⚡ Quick Actions</h2>
+          <div className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
+            <h2 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-800'}`}>⚡ Quick Actions</h2>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: 'Post Referral', icon: '🔗', action: () => navigate('/alumni/referrals') },
@@ -82,9 +84,10 @@ function Home() {
                 { label: 'Interview Reviews', icon: '⭐', action: () => navigate('/alumni/reviews') },
               ].map((a) => (
                 <motion.button key={a.label} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={a.action}
-                  className="flex items-center gap-2 p-3 bg-white/10 rounded-xl hover:bg-white/15 hover:text-cyan-400 transition-all text-left">
+                  className={`flex items-center gap-2 p-3 rounded-xl transition-all text-left ${isDark ? 'bg-white/10 hover:bg-white/15 hover:text-cyan-400 shadow-none' : 'bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-indigo-600 shadow-sm'
+                    }`}>
                   <span className="text-xl">{a.icon}</span>
-                  <span className="text-sm font-medium text-slate-200">{a.label}</span>
+                  <span className={`text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{a.label}</span>
                 </motion.button>
               ))}
             </div>
@@ -93,18 +96,18 @@ function Home() {
 
         <div className="space-y-4">
           {profile && (
-            <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+            <div className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
                   {profile.name?.[0] || '?'}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">{profile.name}</h3>
+                  <h3 className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{profile.name}</h3>
                   <p className="text-sm text-cyan-400 font-medium">{profile.designation}</p>
-                  <p className="text-xs text-slate-400">{profile.company} • Batch {profile.graduationYear}</p>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{profile.company} • Batch {profile.graduationYear}</p>
                 </div>
               </div>
-              {profile.bio && <p className="text-xs text-slate-300 mb-3">{profile.bio}</p>}
+              {profile.bio && <p className={`text-xs mb-3 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{profile.bio}</p>}
               {profile.skills?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {profile.skills.slice(0, 4).map((s) => <span key={s} className="text-xs bg-indigo-50 text-cyan-400 px-2 py-0.5 rounded-full">{s}</span>)}
@@ -120,6 +123,7 @@ function Home() {
 
 function AlumniProfile() {
   const { profile, updateProfile } = useAuth()
+  const { isDark } = useTheme()
   const [form, setForm] = useState({ name: '', graduationYear: '', branch: 'CSE', company: '', designation: '', domain: '', linkedin: '', bio: '', skills: '', mentorshipAvailable: false })
   const [loading, setLoading] = useState(false)
 
@@ -133,29 +137,33 @@ function AlumniProfile() {
     try {
       const { data } = await alumniAPI.updateProfile({ ...form, skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean) })
       if (data.success) { updateProfile(data.profile); toast.success('Profile saved!') }
-    } catch { toast.error('Failed to save') } finally { setLoading(false) }
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to save profile') } finally { setLoading(false) }
   }
 
-  const inputClass = 'w-full px-3 py-2.5 bg-slate-800/80 border border-white/10 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all'
+  const inputClass = `w-full px-3 py-2.5 rounded-xl text-sm transition-all outline-none focus:ring-2 focus:ring-indigo-500/40 border ${isDark
+    ? 'bg-slate-800/80 border-white/10 text-slate-100'
+    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+    }`
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold text-white">Alumni Profile</h1>
+      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Alumni Profile</h1>
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 space-y-4">
+        <div className={`backdrop-blur-xl rounded-2xl p-5 border space-y-4 transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'
+          }`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">Full Name *</label><input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} required /></div>
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">Graduation Year</label><input type="number" value={form.graduationYear} onChange={(e) => setForm({ ...form, graduationYear: e.target.value })} placeholder="2020" className={inputClass} /></div>
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">Company *</label><input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="Google, Microsoft..." className={inputClass} required /></div>
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">Designation *</label><input type="text" value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} placeholder="Software Engineer" className={inputClass} required /></div>
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">Domain</label><input type="text" value={form.domain} onChange={(e) => setForm({ ...form, domain: e.target.value })} placeholder="Backend, AI/ML..." className={inputClass} /></div>
-            <div><label className="text-xs font-medium text-slate-300 mb-1 block">LinkedIn URL</label><input type="text" value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} placeholder="linkedin.com/in/username" className={inputClass} /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Full Name *</label><input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} required /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Graduation Year *</label><input type="number" value={form.graduationYear} onChange={(e) => setForm({ ...form, graduationYear: e.target.value })} placeholder="2020" className={inputClass} required /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Company *</label><input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="Google, Microsoft..." className={inputClass} required /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Designation *</label><input type="text" value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} placeholder="Software Engineer" className={inputClass} required /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Domain</label><input type="text" value={form.domain} onChange={(e) => setForm({ ...form, domain: e.target.value })} placeholder="Backend, AI/ML..." className={inputClass} /></div>
+            <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>LinkedIn URL</label><input type="text" value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} placeholder="linkedin.com/in/username" className={inputClass} /></div>
           </div>
-          <div><label className="text-xs font-medium text-slate-300 mb-1 block">Bio</label><textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} placeholder="Tell students about yourself..." rows={3} className={inputClass} maxLength={500} /></div>
-          <div><label className="text-xs font-medium text-slate-300 mb-1 block">Skills (comma separated)</label><input type="text" value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} placeholder="Python, React, System Design..." className={inputClass} /></div>
+          <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Bio</label><textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} placeholder="Tell students about yourself..." rows={3} className={inputClass} maxLength={500} /></div>
+          <div><label className={`text-xs font-medium mb-1 block ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Skills (comma separated)</label><input type="text" value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} placeholder="Python, React, System Design..." className={inputClass} /></div>
           <div className="flex items-center gap-3">
             <input type="checkbox" id="mentorship" checked={form.mentorshipAvailable} onChange={(e) => setForm({ ...form, mentorshipAvailable: e.target.checked })} className="w-4 h-4 rounded text-cyan-400" />
-            <label htmlFor="mentorship" className="text-sm text-slate-200 font-medium">Available for Mentorship</label>
+            <label htmlFor="mentorship" className={`text-sm font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Available for Mentorship</label>
           </div>
         </div>
         <motion.button type="submit" disabled={loading} whileTap={{ scale: 0.98 }} className="btn-primary flex items-center gap-2 disabled:opacity-60">
@@ -167,6 +175,7 @@ function AlumniProfile() {
 }
 
 function ManageReferrals() {
+  const { isDark } = useTheme()
   const [referrals, setReferrals] = useState([])
   const [showCreate, setShowCreate] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -174,36 +183,36 @@ function ManageReferrals() {
   useEffect(() => { loadReferrals() }, [])
   const loadReferrals = async () => {
     try { const { data } = await alumniAPI.getReferrals(); if (data.success) setReferrals(data.referrals) }
-    catch {} finally { setLoading(false) }
+    catch { } finally { setLoading(false) }
   }
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">My Referrals 🔗</h1>
+        <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>My Referrals 🔗</h1>
         <button onClick={() => setShowCreate(!showCreate)} className="btn-primary text-sm flex items-center gap-2"><Plus className="w-4 h-4" />{showCreate ? 'Cancel' : 'Post Referral'}</button>
       </div>
-      {showCreate && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10"><PostReferral onSuccess={() => { setShowCreate(false); loadReferrals() }} /></motion.div>}
-      {loading ? <div className="text-center py-10"><motion.div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-500 rounded-full mx-auto" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
+      {showCreate && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}><PostReferral onSuccess={() => { setShowCreate(false); loadReferrals() }} /></motion.div>}
+      {loading ? <div className="text-center py-10"><motion.div className={`w-8 h-8 border-2 border-t-indigo-500 rounded-full mx-auto ${isDark ? 'border-indigo-200' : 'border-slate-200'}`} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : (
         <div className="space-y-3">
           {referrals.map((ref, i) => (
-            <motion.div key={ref._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+            <motion.div key={ref._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className={`backdrop-blur-xl rounded-2xl p-5 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div className="flex items-start justify-between mb-2">
-                <div><h3 className="font-semibold text-white">{ref.role}</h3><p className="text-cyan-400 font-medium text-sm">{ref.company}</p></div>
+                <div><h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>{ref.role}</h3><p className="text-cyan-400 font-medium text-sm">{ref.company}</p></div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(ref.status)}`}>{ref.status}</span>
               </div>
-              <div className="flex gap-3 text-xs text-slate-400">
+              <div className={`flex gap-3 text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 <span>{ref.applicants?.length || 0}/{ref.maxReferrals} applied</span>
                 <span>Deadline: {formatDate(ref.deadline)}</span>
                 {ref.salaryRange && <span>💰 {ref.salaryRange}</span>}
               </div>
               {ref.applicants?.length > 0 && (
-                <div className="mt-3 border-t border-gray-100 pt-3">
-                  <p className="text-xs font-semibold text-slate-300 mb-2">Applicants:</p>
+                <div className={`mt-3 border-t pt-3 ${isDark ? 'border-gray-800' : 'border-slate-100'}`}>
+                  <p className={`text-xs font-semibold mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Applicants:</p>
                   <div className="space-y-1">
                     {ref.applicants.slice(0, 3).map((a) => (
                       <div key={a._id} className="flex items-center justify-between text-xs">
-                        <span className="text-slate-200">{a.studentName}</span>
+                        <span className={isDark ? 'text-slate-200' : 'text-slate-600'}>{a.studentName}</span>
                         <span className={`px-2 py-0.5 rounded-full font-medium border ${getStatusColor(a.status)}`}>{a.status}</span>
                       </div>
                     ))}
@@ -221,6 +230,7 @@ function ManageReferrals() {
 
 function MentorshipSlots() {
   const { profile, updateProfile } = useAuth()
+  const { isDark } = useTheme()
   const [slots, setSlots] = useState([{ date: '', time: '', topic: 'General Mentorship', duration: 60 }])
   const [loading, setLoading] = useState(false)
 
@@ -231,22 +241,27 @@ function MentorshipSlots() {
       if (validSlots.length === 0) return toast.error('Please fill all slot details')
       const { data } = await alumniAPI.addMentorshipSlots({ slots: validSlots })
       if (data.success) { toast.success(`${validSlots.length} slots added!`); setSlots([{ date: '', time: '', topic: 'General Mentorship', duration: 60 }]) }
-    } catch { toast.error('Failed to add slots') } finally { setLoading(false) }
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to add slots') } finally { setLoading(false) }
   }
 
-  const inputClass = 'px-3 py-2 bg-slate-800/80 border border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all'
+  const inputClass = `px-3 py-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all border ${isDark
+    ? 'bg-slate-800/80 border-white/10 text-slate-100'
+    : 'bg-slate-50 border-slate-200 text-slate-900'
+    }`
   const topics = ['Resume Review', 'Mock Interview', 'Career Guidance', 'Technical Interview Prep', 'General Mentorship']
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold text-white">Mentorship Slots 📅</h1>
-      <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-5 border border-white/10 space-y-4">
-        <h3 className="font-semibold text-slate-100 text-sm">Add New Slots</h3>
+      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Mentorship Slots 📅</h1>
+      <div className={`backdrop-blur-xl rounded-2xl p-5 border space-y-4 transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
+        <h3 className={`font-semibold text-sm ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>Add New Slots</h3>
         {slots.map((slot, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-white/10 rounded-xl">
-            <div><label className="text-xs text-slate-400 mb-1 block">Date</label><input type="date" value={slot.date} onChange={(e) => setSlots((s) => s.map((x, idx) => idx === i ? { ...x, date: e.target.value } : x))} className={`${inputClass} w-full`} /></div>
-            <div><label className="text-xs text-slate-400 mb-1 block">Time</label><input type="time" value={slot.time} onChange={(e) => setSlots((s) => s.map((x, idx) => idx === i ? { ...x, time: e.target.value } : x))} className={`${inputClass} w-full`} /></div>
-            <div><label className="text-xs text-slate-400 mb-1 block">Topic</label>
+          <motion.div key={i} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={`grid grid-cols-2 md:grid-cols-4 gap-3 p-3 rounded-xl ${isDark ? 'bg-white/10' : 'bg-slate-50 border border-slate-100'
+            }`}>
+            <div><label className={`text-xs mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Date</label><input type="date" value={slot.date} onChange={(e) => setSlots((s) => s.map((x, idx) => idx === i ? { ...x, date: e.target.value } : x))} className={`${inputClass} w-full`} /></div>
+            <div><label className={`text-xs mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Time</label><input type="time" value={slot.time} onChange={(e) => setSlots((s) => s.map((x, idx) => idx === i ? { ...x, time: e.target.value } : x))} className={`${inputClass} w-full`} /></div>
+            <div><label className={`text-xs mb-1 block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Topic</label>
               <select value={slot.topic} onChange={(e) => setSlots((s) => s.map((x, idx) => idx === i ? { ...x, topic: e.target.value } : x))} className={`${inputClass} w-full`}>
                 {topics.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -266,27 +281,28 @@ function MentorshipSlots() {
 }
 
 function InterviewReviews() {
+  const { isDark } = useTheme()
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    alumniAPI.getInterviewReviews().then(({ data }) => { if (data.success) setReviews(data.reviews) }).catch(() => {}).finally(() => setLoading(false))
+    alumniAPI.getInterviewReviews().then(({ data }) => { if (data.success) setReviews(data.reviews) }).catch(() => { }).finally(() => setLoading(false))
   }, [])
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-white">Interview Reviews ⭐</h1>
-      {loading ? <div className="text-center py-10"><motion.div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-500 rounded-full mx-auto" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : reviews.length === 0 ? (
-        <div className="text-center py-10"><div className="text-4xl mb-3">⭐</div><p className="text-slate-400">No interview reviews yet</p></div>
+      <h1 className={`text-2xl font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-900'}`}>Interview Reviews ⭐</h1>
+      {loading ? <div className="text-center py-10"><motion.div className={`w-8 h-8 border-2 border-t-indigo-500 rounded-full mx-auto ${isDark ? 'border-indigo-200' : 'border-slate-200'}`} animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity }} /></div> : reviews.length === 0 ? (
+        <div className="text-center py-10"><div className="text-4xl mb-3">⭐</div><p className={isDark ? 'text-slate-400' : 'text-slate-500'}>No interview reviews yet</p></div>
       ) : (
         <div className="space-y-3">
           {reviews.map((r, i) => (
-            <motion.div key={r._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-4 border border-white/10">
+            <motion.div key={r._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className={`backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
               <div className="flex justify-between mb-2">
-                <div><p className="font-semibold text-white text-sm">{r.driveId?.company}</p><p className="text-xs text-slate-400">{r.type} Round</p></div>
+                <div><p className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-800'}`}>{r.driveId?.company}</p><p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{r.type} Round</p></div>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusColor(r.result)}`}>{r.result}</span>
               </div>
-              {r.feedback && <p className="text-sm text-slate-300">{r.feedback}</p>}
+              {r.feedback && <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{r.feedback}</p>}
               {r.rating && <div className="flex gap-1 mt-2">{[...Array(5)].map((_, idx) => <span key={idx} className={idx < r.rating ? 'text-amber-400' : 'text-gray-200'}>⭐</span>)}</div>}
             </motion.div>
           ))}

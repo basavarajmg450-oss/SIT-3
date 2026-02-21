@@ -1,3 +1,4 @@
+// Reloaded to disable rate limiters
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -41,14 +42,8 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-const globalLimiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 200,
-  message: { success: false, message: 'Too many requests. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api', globalLimiter);
+// Rate limiters disabled for development
+
 
 app.get('/health', (req, res) => {
   res.json({

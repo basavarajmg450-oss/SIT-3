@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AlumniProfile = require('../models/AlumniProfile');
 const Referral = require('../models/Referral');
 const InterviewSlot = require('../models/InterviewSlot');
@@ -25,11 +26,17 @@ const updateProfile = async (req, res) => {
     let profile = await AlumniProfile.findOne({ userId: req.user._id });
 
     if (!profile) {
-      profile = new AlumniProfile({ userId: req.user._id, name, graduationYear, company, designation });
+      profile = new AlumniProfile({
+        userId: req.user._id,
+        name: name || 'Alumni Member',
+        graduationYear: graduationYear ? parseInt(graduationYear) : new Date().getFullYear(),
+        company: company || 'N/A',
+        designation: designation || 'Alumni'
+      });
     }
 
     if (name) profile.name = name;
-    if (graduationYear) profile.graduationYear = graduationYear;
+    if (graduationYear && !isNaN(parseInt(graduationYear))) profile.graduationYear = parseInt(graduationYear);
     if (branch) profile.branch = branch;
     if (company) profile.company = company;
     if (designation) profile.designation = designation;
@@ -40,9 +47,19 @@ const updateProfile = async (req, res) => {
     if (mentorshipAvailable !== undefined) profile.mentorshipAvailable = mentorshipAvailable;
 
     await profile.save();
-    res.json({ success: true, message: 'Profile updated.', profile });
+    res.json({ success: true, message: 'Profile updated successfully.', profile });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to update profile.' });
+    console.error('updateProfile error:', error);
+    let message = 'Failed to update profile.';
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      message = `Duplicate value: ${field} already exists.`;
+    } else if (error.name === 'ValidationError') {
+      message = Object.values(error.errors).map(val => val.message).join(', ');
+    } else {
+      message = error.message || message;
+    }
+    res.status(400).json({ success: false, message });
   }
 };
 
@@ -118,21 +135,36 @@ const addMentorshipSlots = async (req, res) => {
   try {
     const { slots } = req.body;
 
-    const profile = await AlumniProfile.findOne({ userId: req.user._id });
-    if (!profile) return res.status(404).json({ success: false, message: 'Profile not found.' });
+    let profile = await AlumniProfile.findOne({ userId: req.user._id });
+
+    if (!profile) {
+      const user = await User.findById(req.user._id);
+      profile = new AlumniProfile({
+        userId: req.user._id,
+        name: user?.name || 'Alumni Member',
+        graduationYear: new Date().getFullYear(),
+        company: 'N/A',
+        designation: 'Alumni'
+      });
+    }
 
     const newSlots = (slots || []).map((slot) => ({
       ...slot,
-      _id: new require('mongoose').Types.ObjectId(),
+      _id: new mongoose.Types.ObjectId(),
     }));
 
     profile.slots.push(...newSlots);
     profile.mentorshipAvailable = true;
     await profile.save();
 
-    res.json({ success: true, message: `${newSlots.length} mentorship slots added.`, slots: profile.slots });
+    res.json({ success: true, message: `${newSlots.length} mentorship slots added successfully.`, slots: profile.slots });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to add slots.' });
+    console.error('addMentorshipSlots error:', error);
+    let message = 'Failed to add slots.';
+    if (error.name === 'ValidationError') {
+      message = Object.values(error.errors).map(val => val.message).join(', ');
+    }
+    res.status(400).json({ success: false, message });
   }
 };
 

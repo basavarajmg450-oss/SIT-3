@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { authAPI } from '../services/api'
 import toast from 'react-hot-toast'
 import { Mail, ArrowRight, RefreshCw, Shield, Sparkles, TrendingUp, Users } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 const ROLES = [
   { value: 'student', label: 'Student', icon: '🎓', desc: 'Track placements & apply to drives' },
@@ -20,6 +21,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const otpRefs = useRef([])
+  const { isDark } = useTheme()
   const { login, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -187,7 +189,8 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gray-50">
+      <div className={`w-full lg:w-1/2 flex items-center justify-center p-6 transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-[#fcfdff]'
+        }`}>
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 justify-center mb-8">
             <span className="text-3xl">🎓</span>
@@ -204,8 +207,8 @@ export default function Login() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
               >
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back! 👋</h2>
-                <p className="text-gray-500 mb-8">Select your role to continue</p>
+                <h2 className={`text-2xl font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>Welcome Back! 👋</h2>
+                <p className={`${isDark ? 'text-slate-400' : 'text-slate-500'} mb-8`}>Select your role to continue</p>
 
                 <div className="space-y-3 mb-6">
                   {ROLES.map((r) => (
@@ -214,16 +217,15 @@ export default function Login() {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => { setRole(r.value); setStep('email') }}
-                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
-                        role === r.value
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/50'
-                      }`}
+                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${role === r.value
+                          ? isDark ? 'border-indigo-500 bg-indigo-500/10' : 'border-indigo-500 bg-indigo-50'
+                          : isDark ? 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10' : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/50'
+                        }`}
                     >
                       <span className="text-3xl">{r.icon}</span>
                       <div>
-                        <p className="font-semibold text-gray-900">{r.label}</p>
-                        <p className="text-sm text-gray-500">{r.desc}</p>
+                        <p className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{r.label}</p>
+                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{r.desc}</p>
                       </div>
                       <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
                     </motion.button>
@@ -245,14 +247,14 @@ export default function Login() {
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-3xl">{ROLES.find((r) => r.value === role)?.icon}</span>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-                    <p className="text-gray-500 text-sm">as {ROLES.find((r) => r.value === role)?.label}</p>
+                    <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>Sign In</h2>
+                    <p className={`${isDark ? 'text-slate-400' : 'text-slate-500'} text-sm`}>as {ROLES.find((r) => r.value === role)?.label}</p>
                   </div>
                 </div>
 
                 <form onSubmit={handleSendOTP} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+                    <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Email Address</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
@@ -260,7 +262,8 @@ export default function Login() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your.email@college.edu"
-                        className="input-field pl-10"
+                        className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all outline-none focus:ring-2 focus:ring-indigo-500/40 ${isDark ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                          }`}
                         required
                         autoFocus
                       />
@@ -301,11 +304,11 @@ export default function Login() {
                 </button>
 
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${isDark ? 'bg-white/5' : 'bg-indigo-50'}`}>
                     <Shield className="w-8 h-8 text-indigo-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Enter OTP</h2>
-                  <p className="text-gray-500 text-sm">We sent a 6-digit code to</p>
+                  <h2 className={`text-2xl font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>Enter OTP</h2>
+                  <p className={`${isDark ? 'text-slate-400' : 'text-slate-500'} text-sm`}>We sent a 6-digit code to</p>
                   <p className="text-indigo-600 font-medium">{email}</p>
                 </div>
 
@@ -321,9 +324,10 @@ export default function Login() {
                       onChange={(e) => handleOTPChange(idx, e.target.value)}
                       onKeyDown={(e) => handleOTPKeyDown(idx, e)}
                       onPaste={handleOTPPaste}
-                      className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl transition-all focus:outline-none ${
-                        digit ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 focus:border-indigo-400'
-                      }`}
+                      className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl transition-all focus:outline-none ${digit
+                          ? isDark ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300' : 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                          : isDark ? 'border-white/10 bg-white/5 focus:border-indigo-400' : 'border-slate-200 bg-white focus:border-indigo-400'
+                        }`}
                     />
                   ))}
                 </div>

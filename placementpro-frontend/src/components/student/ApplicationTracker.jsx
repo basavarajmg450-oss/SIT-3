@@ -4,10 +4,12 @@ import { studentAPI } from '../../services/api'
 import { formatDate, getStatusColor, getStatusIcon, formatSalaryRange } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 import { ChevronDown, MapPin, Calendar } from 'lucide-react'
+import { useTheme } from '../../context/ThemeContext'
 
 const STATUS_STEPS = ['Applied', 'Shortlisted', 'Aptitude', 'Interview', 'HR Round', 'Selected']
 
 export default function ApplicationTracker({ compact = false }) {
+  const { isDark } = useTheme()
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(null)
@@ -40,12 +42,12 @@ export default function ApplicationTracker({ compact = false }) {
     return (
       <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 animate-pulse">
+          <div key={i} className={`rounded-2xl p-4 border animate-pulse ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-100'}`}>
             <div className="flex gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-xl" />
+              <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className={`h-4 rounded w-3/4 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
+                <div className={`h-3 rounded w-1/2 ${isDark ? 'bg-white/5' : 'bg-slate-100'}`} />
               </div>
             </div>
           </div>
@@ -62,9 +64,10 @@ export default function ApplicationTracker({ compact = false }) {
             <button
               key={s}
               onClick={() => setFilter(s)}
-              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${
-                filter === s ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${filter === s
+                  ? 'bg-indigo-500 text-white'
+                  : isDark ? 'bg-white/10 text-slate-300 hover:bg-white/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
             >
               {s === 'all' ? 'All' : s}
               {s !== 'all' && (
@@ -97,10 +100,10 @@ export default function ApplicationTracker({ compact = false }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                className={`backdrop-blur-xl rounded-2xl border overflow-hidden transition-all duration-300 ${isDark ? 'bg-slate-900/70 border-white/10' : 'bg-white border-slate-200'}`}
               >
                 <div
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className={`p-4 cursor-pointer transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-50'}`}
                   onClick={() => setExpanded(expanded === app._id ? null : app._id)}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -109,9 +112,9 @@ export default function ApplicationTracker({ compact = false }) {
                         {drive.company?.[0] || '?'}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 text-sm">{drive.title || 'Unknown Role'}</p>
+                        <p className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{drive.title || 'Unknown Role'}</p>
                         <p className="text-indigo-600 text-sm font-medium">{drive.company}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Applied {formatDate(app.appliedDate)}</p>
+                        <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Applied {formatDate(app.appliedDate)}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -128,9 +131,9 @@ export default function ApplicationTracker({ compact = false }) {
                     <div className="mt-3 flex items-center gap-0">
                       {STATUS_STEPS.map((step, idx) => (
                         <div key={step} className="flex items-center flex-1">
-                          <div className={`w-full h-1.5 rounded-full transition-all ${idx <= stepIdx ? 'bg-indigo-500' : 'bg-gray-100'}`} />
+                          <div className={`w-full h-1 rounded-full transition-all ${idx <= stepIdx ? 'bg-indigo-500' : isDark ? 'bg-white/10' : 'bg-slate-100'}`} />
                           {idx === STATUS_STEPS.length - 1 && (
-                            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${idx <= stepIdx ? 'bg-indigo-500' : 'bg-gray-200'}`} />
+                            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${idx <= stepIdx ? 'bg-indigo-500' : isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
                           )}
                         </div>
                       ))}
@@ -146,15 +149,15 @@ export default function ApplicationTracker({ compact = false }) {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
+                      <div className={`px-4 pb-4 border-t pt-3 space-y-3 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="bg-gray-50 rounded-xl p-3">
-                            <p className="text-xs text-gray-500">Package</p>
-                            <p className="font-semibold text-gray-900">{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p>
+                          <div className={`rounded-xl p-3 ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                            <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Package</p>
+                            <p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{formatSalaryRange(drive.salaryMin, drive.salaryMax)}</p>
                           </div>
-                          <div className="bg-gray-50 rounded-xl p-3">
-                            <p className="text-xs text-gray-500">Location</p>
-                            <p className="font-semibold text-gray-900">{drive.location || 'TBD'}</p>
+                          <div className={`rounded-xl p-3 ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                            <p className={`text-xs mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Location</p>
+                            <p className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{drive.location || 'TBD'}</p>
                           </div>
                         </div>
 
