@@ -1,0 +1,79 @@
+services:
+  # Backend API Service
+  - type: web
+    name: placementpro-backend
+    env: node
+    plan: free
+    region: oregon
+    
+    rootDir: placementpro-backend
+    buildCommand: npm install
+    startCommand: npm start
+    
+    autoDeploy: true
+    healthCheckPath: /api/health
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_FROM
+        value: PlacementPro <noreply@placementpro.com>
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 5000
+      - key: OTP_EXPIRY_MINUTES
+        value: 10
+      
+      # Sensitive - set in Render dashboard
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: VITE_API_URL
+        sync: false
+
+  # Frontend Static Site (optional - for Render)
+  - type: static_site
+    name: placementpro-frontend
+    env: static
+    plan: free
+    region: oregon
+    
+    rootDir: placementpro-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    
+    autoDeploy: true
+    
+    # Redirect all routes to index.html for React Router
+    routes:
+      - path: /*
+        methods: [GET, HEAD, OPTIONS]
+        destination: /index.html
+        status: 200
+    
+    # Map backend API calls to backend service
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: placementpro-backend
+          property: url
+        scope: build
