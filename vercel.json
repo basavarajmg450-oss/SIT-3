@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "cd placementpro-frontend && npm install && npm run build",
+  "outputDirectory": "placementpro-frontend/dist",
   "framework": "vite",
   "headers": [
     {
@@ -12,6 +12,5 @@
         }
       ]
     }
-  ],
-  "root": "placementpro-frontend"
+  ]
 }
