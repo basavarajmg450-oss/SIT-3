@@ -1,18 +1,43 @@
-import { createContext, useContext, useEffect } from 'react'
-// Theme context - Dark theme only (permanent)
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const ThemeContext = createContext(null)
 
 export const ThemeProvider = ({ children }) => {
-  // Always use dark theme permanently
-  const isDark = true
+  // User's saved preference (persisted to localStorage)
+  const [userIsDark, setUserIsDark] = useState(() => {
+    const saved = localStorage.getItem('pp_theme')
+    return saved ? saved === 'dark' : true
+  })
+
+  // Page-level force-dark override (e.g. Landing page always dark)
+  const [forceDark, setForceDark] = useState(false)
+
+  // Effective dark = force OR user preference
+  const isDark = forceDark || userIsDark
 
   useEffect(() => {
-    document.documentElement.classList.add('dark')
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDark])
+
+  const toggleTheme = () => {
+    setUserIsDark((prev) => {
+      const next = !prev
+      localStorage.setItem('pp_theme', next ? 'dark' : 'light')
+      return next
+    })
+  }
+
+  // Stable callback so Landing's useEffect dep array works
+  const handleSetForceDark = useCallback((val) => {
+    setForceDark(val)
   }, [])
 
   return (
-    <ThemeContext.Provider value={{ isDark }}>
+    <ThemeContext.Provider value={{ isDark, toggleTheme, setForceDark: handleSetForceDark }}>
       {children}
     </ThemeContext.Provider>
   )
@@ -23,3 +48,4 @@ export const useTheme = () => {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
   return ctx
 }
+

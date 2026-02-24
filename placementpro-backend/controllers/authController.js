@@ -68,6 +68,7 @@ const login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid role.' });
     }
 
+    // Use .lean() for faster read; keep password field
     const user = await User.findOne({ email: email.toLowerCase(), role }).select('+password');
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
@@ -82,23 +83,23 @@ const login = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Account is disabled.' });
     }
 
-    user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
-
+    // Run lastLogin update + profile fetch in parallel — don't await save() inline
     const token = generateToken({ userId: user._id, email: user.email, role: user.role });
 
-    let profile = null;
-    if (user.role === 'student') {
-      profile = await StudentProfile.findOne({ userId: user._id });
-    } else if (user.role === 'alumni') {
-      profile = await AlumniProfile.findOne({ userId: user._id });
-    }
+    const [_, profile] = await Promise.all([
+      User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } }),
+      user.role === 'student'
+        ? StudentProfile.findOne({ userId: user._id }).lean()
+        : user.role === 'alumni'
+          ? AlumniProfile.findOne({ userId: user._id }).lean()
+          : Promise.resolve(null),
+    ]);
 
     res.json({
       success: true,
       message: 'Login successful!',
       token,
-      user: { id: user._id, email: user.email, role: user.role, name: user.name, lastLogin: user.lastLogin },
+      user: { id: user._id, email: user.email, role: user.role, name: user.name, lastLogin: new Date() },
       profile,
       isNewUser: !profile,
     });

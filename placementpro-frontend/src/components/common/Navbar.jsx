@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { notificationAPI } from '../../services/api'
 import { timeAgo } from '../../utils/helpers'
-import { Bell, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
+import { Bell, LogOut, User, Menu, X, ChevronDown, Plus, Sun, Moon } from 'lucide-react'
 
 export default function Navbar({ onMenuClick, sidebarOpen }) {
   const { user, profile, logout } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -69,15 +71,17 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b bg-slate-900/80 border-white/10 shadow-lg transition-all duration-300">
+    <nav className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b shadow-lg transition-all duration-300 ${isDark ? 'bg-slate-900/80 border-white/10' : 'bg-white/90 border-slate-200'
+      }`}>
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <button onClick={onMenuClick} className="p-2 rounded-xl transition-colors lg:hidden hover:bg-white/10 text-white">
+          <button onClick={onMenuClick} className={`p-2 rounded-xl transition-colors lg:hidden ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-700'
+            }`}>
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎓</span>
-            <span className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <span className={`font-bold text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent`}>
               PlacementPro
             </span>
           </div>
@@ -92,6 +96,29 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
               <Plus className="w-4 h-4" /> New Drive
             </button>
           )}
+
+          {/* Theme Toggle */}
+          <motion.button
+            onClick={toggleTheme}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className={`p-2 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-yellow-300' : 'hover:bg-slate-100 text-slate-600'
+              }`}
+            aria-label="Toggle theme"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isDark ? (
+                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Sun className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Moon className="w-5 h-5" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
 
           <div className="relative" ref={notifRef}>
             <button

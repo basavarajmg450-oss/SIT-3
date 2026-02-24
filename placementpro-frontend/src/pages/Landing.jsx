@@ -327,8 +327,17 @@ function DashboardLoginCard({ dashboard, onSuccess }) {
 
 export default function Landing() {
   const { user, login } = useAuth()
-  const { isDark } = useTheme()
+  const { setForceDark } = useTheme()
   const navigate = useNavigate()
+
+  // Force dark mode ONLY on the landing page.
+  // setForceDark(true) makes ThemeContext report isDark=true for ALL consumers
+  // (including SharedBackground) without changing the user's saved preference.
+  // Cleanup on unmount restores their actual preference.
+  useEffect(() => {
+    setForceDark(true)
+    return () => setForceDark(false)
+  }, [setForceDark])
 
   useEffect(() => {
     if (user) {
@@ -352,7 +361,7 @@ export default function Landing() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 overflow-x-hidden relative ${isDark ? 'text-white' : 'text-slate-900'}`}>
+    <div className="min-h-screen transition-colors duration-500 overflow-x-hidden relative text-white">
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-16 z-10">
         <motion.div className="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden>
           <motion.div className="w-[min(80vw,400px)] h-64 rounded-full bg-cyan-500/20 blur-[80px]" animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
@@ -370,7 +379,7 @@ export default function Landing() {
             <motion.span className="inline-block ml-2" animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}><Sparkles className="w-8 h-8 md:w-12 md:h-12 text-cyan-400 inline-block" /></motion.span>
           </motion.h1>
 
-          <motion.p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] ${isDark ? 'text-white/90' : 'text-slate-600'}`} variants={itemVariants} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+          <motion.p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] text-white/90" variants={itemVariants} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
             Transform your campus placements with <motion.span className="text-cyan-300 font-semibold" animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 2, repeat: Infinity }}>AI-powered insights</motion.span>, streamlined processes, and real-time collaboration between students, TPO, and alumni.
           </motion.p>
 
@@ -408,7 +417,7 @@ export default function Landing() {
             <motion.h2 className="text-4xl md:text-5xl font-bold mb-4" initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               Why Choose <motion.span className="text-cyan-400" animate={{ textShadow: ['0 0 20px rgba(56,189,248,0.5)', '0 0 40px rgba(56,189,248,0.8)', '0 0 20px rgba(56,189,248,0.5)'] }} transition={{ duration: 2, repeat: Infinity }}>PlacementPro?</motion.span>
             </motion.h2>
-            <motion.p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/70' : 'text-slate-500'}`} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+            <motion.p className="text-lg max-w-2xl mx-auto text-white/70" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
               Everything you need to manage campus placements efficiently and effectively
             </motion.p>
           </motion.div>
@@ -434,7 +443,7 @@ export default function Landing() {
             <motion.h2 className="text-4xl md:text-5xl font-bold mb-4" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, type: 'spring', stiffness: 80 }}>
               Choose Your <motion.span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent" animate={{ backgroundPosition: ['0%', '100%'] }} transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}>Dashboard</motion.span>
             </motion.h2>
-            <motion.p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/70' : 'text-slate-500'}`} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>Tailored experiences for students, TPO officers, and alumni</motion.p>
+            <motion.p className="text-lg max-w-2xl mx-auto text-white/70" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>Tailored experiences for students, TPO officers, and alumni</motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 items-stretch" initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} variants={containerVariants}>
