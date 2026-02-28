@@ -361,7 +361,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen transition-colors duration-500 overflow-x-hidden relative text-white">
+    <div className="min-h-screen bg-slate-900 transition-colors duration-500 overflow-x-hidden relative text-white">
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-16 z-10">
         <motion.div className="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden>
           <motion.div className="w-[min(80vw,400px)] h-64 rounded-full bg-cyan-500/20 blur-[80px]" animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />

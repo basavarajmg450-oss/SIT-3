@@ -10,6 +10,9 @@ export const ThemeProvider = ({ children }) => {
   })
 
   // Page-level force-dark override (e.g. Landing page always dark)
+  // Must default false — Landing.jsx explicitly sets it true on mount.
+  // Defaulting to true would incorrectly force dark on protected pages
+  // when a user navigates directly to /student, /tpo, etc.
   const [forceDark, setForceDark] = useState(false)
 
   // Effective dark = force OR user preference
@@ -48,4 +51,3 @@ export const useTheme = () => {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
   return ctx
 }
-
