@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import { notificationAPI } from '../../services/api'
 import { timeAgo } from '../../utils/helpers'
-import { Bell, LogOut, User, Menu, X, ChevronDown, Plus, Sun, Moon } from 'lucide-react'
+import { Bell, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
 
 export default function Navbar({ onMenuClick, sidebarOpen }) {
   const { user, profile, logout } = useAuth()
@@ -97,28 +97,7 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
             </button>
           )}
 
-          {/* Theme Toggle */}
-          <motion.button
-            onClick={toggleTheme}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={`p-2 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-yellow-300' : 'hover:bg-slate-100 text-slate-600'
-              }`}
-            aria-label="Toggle theme"
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isDark ? (
-                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Sun className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Moon className="w-5 h-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          {/* Theme toggle removed — app is always in dark mode */}
 
           <div className="relative" ref={notifRef}>
             <button
