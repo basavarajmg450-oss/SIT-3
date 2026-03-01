@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useCallback } from 'react'
 
 const ThemeContext = createContext(null)
 
@@ -8,19 +8,24 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     // Force the dark class on <html> immediately and keep it there permanently.
-    document.documentElement.classList.add('dark')
-    // Also pin it in localStorage so any old 'light' value is overwritten.
-    localStorage.setItem('pp_theme', 'dark')
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('pp_theme', 'dark')
+    }
   }, [])
 
-  // toggleTheme is a no-op: dark mode is enforced system-wide.
-  const toggleTheme = () => { }
+  // Memorize no-ops so Landing.jsx's useEffect dependency array doesn't trigger loops
+  const toggleTheme = useCallback(() => { }, [])
+  const setForceDark = useCallback(() => { }, [])
 
-  // setForceDark is kept for API compatibility with Landing.jsx (does nothing extra).
-  const setForceDark = () => { }
+  const value = useMemo(() => ({
+    isDark,
+    toggleTheme,
+    setForceDark
+  }), [isDark, toggleTheme, setForceDark])
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme, setForceDark }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )
