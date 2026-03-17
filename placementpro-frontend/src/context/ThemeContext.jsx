@@ -1,28 +1,50 @@
-import React, { createContext, useContext, useEffect, useMemo, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react'
 
 const ThemeContext = createContext(null)
 
 export const ThemeProvider = ({ children }) => {
-  // Application is ALWAYS dark — no toggle allowed.
-  const isDark = true
+  // Initialize from localStorage or default to dark
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('pp_theme')
+    return saved ? saved === 'dark' : true
+  })
 
+  // forceDark is used by Landing.jsx to override user preference
+  const [forceDark, setForceDarkState] = useState(false)
+
+  // Apply theme to document
   useEffect(() => {
-    // Force the dark class on <html> immediately and keep it there permanently.
     if (typeof document !== 'undefined') {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('pp_theme', 'dark')
+      // If forceDark is true (landing page), always use dark
+      // Otherwise use the user's preference
+      const effectiveDarkMode = forceDark || isDark
+      
+      if (effectiveDarkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
+  }, [isDark, forceDark])
+
+  const toggleTheme = useCallback(() => {
+    setIsDark(prev => {
+      const newVal = !prev
+      localStorage.setItem('pp_theme', newVal ? 'dark' : 'light')
+      return newVal
+    })
   }, [])
 
-  // Memorize no-ops so Landing.jsx's useEffect dependency array doesn't trigger loops
-  const toggleTheme = useCallback(() => { }, [])
-  const setForceDark = useCallback(() => { }, [])
+  const setForceDark = useCallback((val) => {
+    setForceDarkState(val)
+  }, [])
 
   const value = useMemo(() => ({
-    isDark,
+    isDark: forceDark || isDark, // This ensures components use the "effective" theme
+    actualTheme: isDark ? 'dark' : 'light', // For internal use if needed
     toggleTheme,
     setForceDark
-  }), [isDark, toggleTheme, setForceDark])
+  }), [isDark, toggleTheme, setForceDark, forceDark])
 
   return (
     <ThemeContext.Provider value={value}>

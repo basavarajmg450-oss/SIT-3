@@ -6,6 +6,7 @@ import { authAPI } from '../services/api'
 import toast from 'react-hot-toast'
 import { Mail, ArrowRight, RefreshCw, Shield, Sparkles, TrendingUp, Users } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import ThemeSwitcher from '../components/common/ThemeSwitcher'
 
 const ROLES = [
   { value: 'student', label: 'Student', icon: '🎓', desc: 'Track placements & apply to drives' },
@@ -197,6 +198,10 @@ export default function Login() {
             <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               PlacementPro
             </span>
+          </div>
+
+          <div className="absolute top-6 right-6 z-20">
+            <ThemeSwitcher />
           </div>
 
           <AnimatePresence mode="wait">

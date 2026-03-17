@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { notificationAPI } from '../../services/api'
 import { timeAgo } from '../../utils/helpers'
 import { Bell, LogOut, User, Menu, X, ChevronDown, Plus } from 'lucide-react'
+import ThemeSwitcher from './ThemeSwitcher'
 
 export default function Navbar({ onMenuClick, sidebarOpen }) {
   const { user, profile, logout } = useAuth()
@@ -97,15 +98,17 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
             </button>
           )}
 
-          {/* Theme toggle removed — app is always in dark mode */}
+          <div className="flex items-center gap-1">
+            <ThemeSwitcher />
+          </div>
 
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => setShowNotifs(!showNotifs)}
-              className="relative p-2 rounded-xl transition-colors hover:bg-white/10 text-white"
+              className={`relative p-2 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-100 text-slate-700'}`}
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-slate-200" />
+              <Bell className={`w-5 h-5 ${isDark ? 'text-slate-200' : 'text-slate-600'}`} />
               {unreadCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
@@ -124,10 +127,12 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute right-0 top-12 w-80 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 bg-slate-900/95 border-white/10"
+                  className={`absolute right-0 top-12 w-80 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 transition-all duration-300 ${
+                    isDark ? 'bg-slate-900/95 border-white/10' : 'bg-white/95 border-slate-200'
+                  }`}
                 >
-                  <div className="flex items-center justify-between p-4 border-b border-white/10">
-                    <h3 className="font-semibold text-white">Notifications</h3>
+                  <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>Notifications</h3>
                     {unreadCount > 0 && (
                       <button onClick={handleMarkAllRead} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">
                         Mark all read
@@ -144,16 +149,18 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                       notifications.map((n) => (
                         <motion.div
                           key={n._id}
-                          whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-                          className={`p-4 border-b border-white/5 cursor-pointer transition-colors ${!n.isRead ? 'bg-cyan-500/10' : ''}`}
+                          whileHover={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }}
+                          className={`p-4 border-b cursor-pointer transition-colors ${
+                            isDark ? 'border-white/5' : 'border-slate-50'
+                          } ${!n.isRead ? (isDark ? 'bg-cyan-500/10' : 'bg-indigo-50/50') : ''}`}
                           onClick={() => { handleMarkRead(n._id); setShowNotifs(false) }}
                         >
                           <div className="flex gap-3">
                             <span className="text-lg flex-shrink-0">{getTypeIcon(n.type)}</span>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium ${n.isRead ? 'text-slate-300' : 'text-white'}`}>{n.title}</p>
-                              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{n.message}</p>
-                              <p className="text-xs text-slate-500 mt-1">{timeAgo(n.createdAt)}</p>
+                              <p className={`text-sm font-medium ${n.isRead ? (isDark ? 'text-slate-300' : 'text-slate-600') : (isDark ? 'text-white' : 'text-slate-900')}`}>{n.title}</p>
+                              <p className={`text-xs mt-0.5 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{n.message}</p>
+                              <p className="text-xs mt-1 text-slate-500">{timeAgo(n.createdAt)}</p>
                             </div>
                             {!n.isRead && <span className="w-2 h-2 bg-cyan-400 rounded-full flex-shrink-0 mt-1.5" />}
                           </div>
@@ -169,20 +176,20 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/10 transition-colors"
+              className={`flex items-center gap-2 p-1.5 rounded-xl transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
             >
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
                 {profile?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold leading-tight text-white">
+                <p className={`text-sm font-semibold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {profile?.name || user?.email?.split('@')[0] || 'User'}
                 </p>
                 <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${roleBadge[user?.role]}`}>
                   {roleLabel[user?.role]}
                 </span>
               </div>
-              <ChevronDown className="w-4 h-4 text-slate-400 hidden md:block" />
+              <ChevronDown className={`w-4 h-4 hidden md:block ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
             </button>
 
             <AnimatePresence>
@@ -192,22 +199,26 @@ export default function Navbar({ onMenuClick, sidebarOpen }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute right-0 top-12 w-52 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 bg-slate-900/95 border-white/10"
+                  className={`absolute right-0 top-12 w-52 backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden z-50 transition-all duration-300 ${
+                    isDark ? 'bg-slate-900/95 border-white/10' : 'bg-white/95 border-slate-200'
+                  }`}
                 >
-                  <div className="p-3 border-b border-white/10">
-                    <p className="text-sm font-semibold text-white">{profile?.name || 'User'}</p>
-                    <p className="text-xs text-slate-500">{user?.email}</p>
+                  <div className={`p-3 border-b ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                    <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{profile?.name || 'User'}</p>
+                    <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{user?.email}</p>
                   </div>
                   <button
                     onClick={() => { setShowProfile(false); navigate(user?.role === 'student' ? '/student' : user?.role === 'tpo' ? '/tpo' : '/alumni') }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors text-slate-200 hover:bg-white/10"
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
+                      isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
                   >
                     <User className="w-4 h-4" />
                     Dashboard
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
