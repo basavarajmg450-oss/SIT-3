@@ -13,31 +13,39 @@ export const AuthProvider = ({ children }) => {
   // Check backend health on mount
   useEffect(() => {
     const checkBackendHealth = async () => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 8000); // 8 second timeout for slow free-tier spin-up
+
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/health`, {
           method: 'GET',
-          timeout: 3000
-        })
+          signal: controller.signal
+        });
+        clearTimeout(id);
         if (!response.ok) {
-          throw new Error('Backend unavailable')
+          throw new Error('Backend unavailable');
         }
       } catch (error) {
-        toast.error(
-          'Backend not running. Run: cd placementpro-backend && npm run dev',
-          {
-            duration: 0, // Don't auto-dismiss
-            icon: '⚠️',
-            style: {
-              background: '#fee2e2',
-              color: '#991b1b',
-              border: '2px solid #dc2626',
-            },
-          }
-        )
+        clearTimeout(id);
+        // Only show error if we're not just waiting for spin-up
+        if (error.name !== 'AbortError') {
+          toast.error(
+            'Backend unavailable. If on a free tier, it may take a minute to spin up.',
+            {
+              duration: 5000, 
+              icon: '⚠️',
+              style: {
+                background: '#fee2e2',
+                color: '#991b1b',
+                border: '2px solid #dc2626',
+              },
+            }
+          );
+        }
       }
-    }
-    checkBackendHealth()
-  }, [])
+    };
+    checkBackendHealth();
+  }, []);
 
   const loadUser = useCallback(async () => {
     const storedToken = localStorage.getItem('pp_token')

@@ -55,6 +55,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Added /api/health to match Render's healthCheckPath and frontend's verification logic
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK' });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/tpo', tpoRoutes);

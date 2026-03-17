@@ -191,9 +191,9 @@ function DashboardLoginCard({ dashboard, onSuccess }) {
       let msg = err.response?.data?.message
       if (!msg) {
         if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-          msg = 'Backend not running. Run: cd placementpro-backend && npm run dev'
+          msg = 'Backend unavailable. If on a free tier, it may take a minute to spin up.'
         } else if ([500, 502, 503, 504].includes(err.response?.status)) {
-          msg = 'Server error. Check MongoDB connection and run: npm run seed'
+          msg = 'Server error. Please try again later.'
         } else {
           msg = 'Login failed'
         }
@@ -217,9 +217,9 @@ function DashboardLoginCard({ dashboard, onSuccess }) {
       let msg = err.response?.data?.message
       if (!msg) {
         if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
-          msg = 'Backend not running. Run: cd placementpro-backend && npm run dev'
+          msg = 'Backend unavailable. If on a free tier, it may take a minute to spin up.'
         } else if ([500, 502, 503, 504].includes(err.response?.status)) {
-          msg = 'Server error. Check MongoDB connection and run: npm run seed'
+          msg = 'Server error. Please try again later.'
         } else {
           msg = 'Registration failed'
         }
